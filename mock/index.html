@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Task Manager</title>
+    <style>
+        :root {
+            --bg: #ffffff;
+            --border: #e0e0e0;
+            --primary: #4a76a8;
+            --danger: #e74c3c;
+            --text: #333333;
+            --hover-bg: #f5f5f5;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 1rem;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+        }
+
+        .header {
+            display: flex;
+            justify-content: flex-end;
+            margin-bottom: 1rem;
+            position: relative;
+        }
+
+        .username {
+            color: var(--primary);
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .logout-btn {
+            display: none;
+            position: absolute;
+            right: 0;
+            top: 100%;
+            background: white;
+            border: 1px solid var(--border);
+            padding: 0.5rem;
+            border-radius: 0.25rem;
+            cursor: pointer;
+            z-index: 10;
+        }
+
+        .logout-btn.visible {
+            display: block;
+        }
+
+        .task {
+            display: flex;
+            gap: 1rem;
+            padding: 0.75rem;
+            margin: 0.5rem 0;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            transition: background 0.2s;
+            align-items: flex-start;
+            border: 1px solid var(--border);
+        }
+
+        .task:hover {
+            background: var(--hover-bg);
+        }
+
+        .task-number {
+            color: var(--primary);
+            font-weight: 600;
+            flex-shrink: 0;
+            width: 2.5rem;
+        }
+
+        .task-content-wrapper {
+            flex-grow: 1;
+            min-width: 0;
+            overflow: hidden;
+        }
+
+        .task-title {
+            font-weight: bold;
+            word-break: break-word;
+            overflow-wrap: break-word;
+            max-width: 100%;
+        }
+
+        .task-spoiler {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+            width: 100%;
+        }
+
+        .task-spoiler.active {
+            max-height: none;
+        }
+
+        .task-content {
+            padding: 0.5rem 0;
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+
+        .task-actions {
+            flex-shrink: 0;
+            margin-left: auto;
+        }
+
+        .nav-link {
+            color: var(--primary);
+            text-decoration: none;
+            margin: 0.5rem 0;
+            display: inline-block;
+        }
+
+        .input-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+
+        .toggle-spoilers {
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 0.5rem 1rem;
+            cursor: pointer;
+            font: inherit;
+        }
+
+        .toggle-spoilers:hover {
+            opacity: 0.9;
+        }
+
+        #taskInput {
+            width: 100%;
+            padding: 0.75rem;
+            margin: 1rem 0;
+            border: 1px solid var(--border);
+            border-radius: 0.25rem;
+            resize: vertical;
+            min-height: 4rem;
+            box-sizing: border-box;
+        }
+
+        .delete-btn {
+            background: var(--danger);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 4px 8px;
+            cursor: pointer;
+            font: inherit;
+            flex-shrink: 0;
+        }
+
+        #mainPage, #archivePage {
+            transition: opacity 0.3s;
+        }
+
+        #archivePage {
+            display: none;
+            opacity: 0;
+        }
+
+        @media (max-width: 600px) {
+            body {
+                padding: 0.75rem;
+            }
+
+            .task {
+                flex-direction: column;
+                gap: 0.5rem;
+                padding: 1rem;
+            }
+
+            .task-number {
+                width: auto;
+            }
+
+            .task-actions {
+                margin-left: 0;
+                margin-top: 0.5rem;
+                align-self: flex-end;
+            }
+
+            #taskInput {
+                min-height: 3rem;
+                padding: 0.5rem;
+            }
+
+            .input-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <span class="username" id="username">Пользователь: Тест</span>
+        <button class="logout-btn" id="logoutBtn">Выйти</button>
+    </div>
+
+    <div id="mainPage">
+        <a href="#archive" class="nav-link">Архив задач</a>
+        <div class="input-header">
+            <h3>Новая задача</h3>
+            <button class="toggle-spoilers" id="toggleAllSpoilers">Развернуть все</button>
+        </div>
+        <textarea
+            id="taskInput"
+            placeholder="Введите задачу (Ctrl+Enter для добавления)"
+            aria-label="Поле ввода новой задачи"
+        ></textarea>
+        <div id="tasks"></div>
+    </div>
+
+    <div id="archivePage">
+        <a href="#" class="nav-link">← Назад к задачам</a>
+        <div id="archiveTasks"></div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
