@@ -1,6 +1,6 @@
 FROM nginx:alpine
-WORKDIR /usr/share/nginx/html
+WORKDIR /app
 #COPY dist/ .
 COPY mock/app.js .
 COPY mock/index.html .
-COPY nginx.conf /etc/nginx/conf.d/default.conf
+COPY nginx.conf /etc/nginx/nginx.conf
