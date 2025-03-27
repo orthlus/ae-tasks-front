@@ -12,7 +12,7 @@ class TaskManager {
         this.setupEventListeners();
         this.setupUserDropdown();
         this.setupToggleAllSpoilers();
-        this.setupMobileSaveButton();
+        this.setupSaveButton();
         this.setupClearArchiveButton();
         this.setupPasswordModal();
         this.addMockTasks();
@@ -69,17 +69,22 @@ class TaskManager {
         });
     }
 
-    setupMobileSaveButton() {
-        const mobileSaveBtn = document.getElementById('mobileSaveBtn');
+    setupSaveButton() {
+        const saveBtn = document.getElementById('saveBtn');
         const taskInput = document.getElementById('taskInput');
 
-        mobileSaveBtn.addEventListener('click', () => {
-            if (taskInput.value.trim()) {
-                this.addTask(taskInput.value);
-                taskInput.value = '';
-                taskInput.focus();
-            }
+        saveBtn.addEventListener('click', () => {
+            this.saveTask();
         });
+    }
+
+    saveTask() {
+        const taskInput = document.getElementById('taskInput');
+        if (taskInput.value.trim()) {
+            this.addTask(taskInput.value);
+            taskInput.value = '';
+            taskInput.focus();
+        }
     }
 
     setupClearArchiveButton() {
@@ -256,10 +261,11 @@ class TaskManager {
     }
 
     setupEventListeners() {
-        document.getElementById('taskInput').addEventListener('keydown', e => {
+        const taskInput = document.getElementById('taskInput');
+
+        taskInput.addEventListener('keydown', e => {
             if (e.ctrlKey && e.key === 'Enter') {
-                this.addTask(e.target.value);
-                e.target.value = '';
+                this.saveTask();
                 e.preventDefault();
             }
         });
