@@ -4,6 +4,16 @@ class TaskManager {
         this.archivedTasks = [];
         this.currentId = 1;
         this.allSpoilersExpanded = false;
+
+        this.handleResize = () => {
+            if (window.location.hash === '#archive') {
+                this.renderArchived();
+            } else {
+                this.render();
+            }
+        };
+
+        window.addEventListener('resize', this.handleResize);
         this.init();
     }
 
@@ -240,20 +250,30 @@ class TaskManager {
     renderTasks() {
         const container = document.getElementById('tasks');
         container.innerHTML = this.tasks.map(task => `
-            <div class="task" data-id="${task.id}">
+        <div class="task" data-id="${task.id}">
+            ${window.innerWidth <= 600 ? `
+            <div class="task-header-mobile">
                 <div class="task-number">#${task.number}</div>
-                <div class="task-content-wrapper">
-                    <div class="task-title">${task.title}</div>
-                    ${task.description ? `
-                    <div class="task-spoiler">
-                        <div class="task-content">${task.description}</div>
-                    </div>` : ''}
-                </div>
+                <div class="task-title-mobile">${task.title}</div>
                 <div class="task-actions">
                     <button class="delete-btn" data-id="${task.id}">×</button>
                 </div>
             </div>
-        `).join('');
+            ` : `
+            <div class="task-number">#${task.number}</div>
+            <div class="task-content-wrapper">
+                <div class="task-title">${task.title}</div>
+                ${task.description ? `
+                <div class="task-spoiler">
+                    <div class="task-content">${task.description}</div>
+                </div>` : ''}
+            </div>
+            <div class="task-actions">
+                <button class="delete-btn" data-id="${task.id}">×</button>
+            </div>
+            `}
+        </div>
+    `).join('');
     }
 
     renderArchived() {
@@ -263,20 +283,30 @@ class TaskManager {
         clearArchiveBtn.style.display = this.archivedTasks.length ? 'block' : 'none';
 
         container.innerHTML = this.archivedTasks.map(task => `
-            <div class="task" data-id="${task.id}">
+        <div class="task" data-id="${task.id}">
+            ${window.innerWidth <= 600 ? `
+            <div class="task-header-mobile">
                 <div class="task-number">#${task.number}</div>
-                <div class="task-content-wrapper">
-                    <div class="task-title">${task.title}</div>
-                    ${task.description ? `
-                    <div class="task-spoiler">
-                        <div class="task-content">${task.description}</div>
-                    </div>` : ''}
-                </div>
+                <div class="task-title-mobile">${task.title}</div>
                 <div class="task-actions">
                     <button class="delete-btn" data-id="${task.id}" data-permanent="true">×</button>
                 </div>
             </div>
-        `).join('');
+            ` : `
+            <div class="task-number">#${task.number}</div>
+            <div class="task-content-wrapper">
+                <div class="task-title">${task.title}</div>
+                ${task.description ? `
+                <div class="task-spoiler">
+                    <div class="task-content">${task.description}</div>
+                </div>` : ''}
+            </div>
+            <div class="task-actions">
+                <button class="delete-btn" data-id="${task.id}" data-permanent="true">×</button>
+            </div>
+            `}
+        </div>
+    `).join('');
 
         this.setupTaskInteractions(true);
     }
