@@ -413,31 +413,20 @@ class TaskManager {
             titleEl.addEventListener('click', (e) => {
                 if (e.target.classList.contains('delete-btn')) return;
 
-                const taskId = parseInt(titleEl.dataset.id);
                 const taskEl = titleEl.closest('.task');
-                const spoiler = taskEl.querySelector('.task-spoiler');
-
-                if (spoiler) {
-                    spoiler.classList.toggle('active');
-
-                    if (spoiler.classList.contains('active')) {
-                        setTimeout(() => {
-                            spoiler.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-                        }, 10);
-                    }
-                }
+                this.toggleTaskDescription(taskEl);
             });
         });
     }
 
     toggleTaskDescription(taskElement) {
         const spoiler = taskElement.querySelector('.task-spoiler');
-        spoiler?.classList.toggle('active');
+        if (!spoiler) return;
 
-        if (spoiler?.classList.contains('active')) {
-            setTimeout(() => {
-                spoiler.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-            }, 10);
+        spoiler.classList.toggle('active');
+
+        if (spoiler.classList.contains('active')) {
+            spoiler.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
         }
     }
 }
