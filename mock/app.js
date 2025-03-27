@@ -15,6 +15,10 @@ class TaskManager {
 
         window.addEventListener('resize', this.handleResize);
         this.init();
+
+        this.taskToDelete = null;
+        this.isPermanentDelete = false;
+        this.setupConfirmationModal();
     }
 
     init() {
@@ -30,6 +34,29 @@ class TaskManager {
         this.checkHash();
         this.focusInput();
         this.setupAutogrow();
+    }
+
+    setupConfirmationModal() {
+        const modal = document.getElementById('confirmationModal');
+        const cancelBtn = document.getElementById('modalCancel');
+        const confirmBtn = document.getElementById('modalConfirm');
+
+        cancelBtn.addEventListener('click', () => {
+            modal.style.display = 'none';
+            this.taskToDelete = null;
+        });
+
+        confirmBtn.addEventListener('click', () => {
+            if (this.taskToDelete) {
+                if (this.isPermanentDelete) {
+                    this.permanentlyDeleteTask(this.taskToDelete);
+                } else {
+                    this.deleteTask(this.taskToDelete);
+                }
+            }
+            modal.style.display = 'none';
+            this.taskToDelete = null;
+        });
     }
 
     setupAutogrow() {
@@ -313,6 +340,7 @@ class TaskManager {
 
     setupEventListeners() {
         const taskInput = document.getElementById('taskInput');
+        const saveBtn = document.getElementById('saveBtn');
 
         taskInput.addEventListener('keydown', e => {
             if (e.ctrlKey && e.key === 'Enter') {
@@ -321,14 +349,42 @@ class TaskManager {
             }
         });
 
+        saveBtn.addEventListener('click', () => {
+            this.saveTask();
+        });
+
         document.body.addEventListener('click', e => {
             if (e.target.classList.contains('delete-btn')) {
-                const id = parseInt(e.target.dataset.id);
-                if (e.target.dataset.permanent === 'true') {
-                    this.permanentlyDeleteTask(id);
-                } else {
-                    this.deleteTask(id);
-                }
+                e.preventDefault();
+                e.stopPropagation();
+
+                this.taskToDelete = parseInt(e.target.dataset.id);
+                this.isPermanentDelete = e.target.dataset.permanent === 'true';
+
+                document.getElementById('confirmationModal').style.display = 'flex';
+            }
+
+            if (e.target.classList.contains('confirmation-modal')) {
+                document.getElementById('confirmationModal').style.display = 'none';
+                this.taskToDelete = null;
+            }
+        });
+
+        document.addEventListener('keydown', e => {
+            if (e.key === 'Escape' &&
+                document.getElementById('confirmationModal').style.display === 'flex') {
+                document.getElementById('confirmationModal').style.display = 'none';
+                this.taskToDelete = null;
+            }
+        });
+
+        this.setupTaskInteractions();
+
+        window.addEventListener('hashchange', () => {
+            if (window.location.hash === '#archive') {
+                this.showArchive();
+            } else {
+                this.showMain();
             }
         });
     }
