@@ -289,7 +289,7 @@ class TaskManager {
             ${isMobile ? `
             <div class="task-header-mobile">
                 <div class="task-number">#${task.number}</div>
-                <div class="task-title-mobile" data-id="${task.id}">${task.title}</div>
+                <div class="task-title-mobile">${task.title}</div>
                 <div class="task-actions">
                     <button class="delete-btn" data-id="${task.id}">×</button>
                 </div>
@@ -298,7 +298,7 @@ class TaskManager {
             ` : `
             <div class="task-number">#${task.number}</div>
             <div class="task-content-wrapper">
-                <div class="task-title" data-id="${task.id}">${task.title}</div>
+                <div class="task-title">${task.title}</div>
                 ${descriptionHtml}
             </div>
             <div class="task-actions">
@@ -329,7 +329,7 @@ class TaskManager {
             ${isMobile ? `
             <div class="task-header-mobile">
                 <div class="task-number">#${task.number}</div>
-                <div class="task-title-mobile" data-id="${task.id}">${task.title}</div>
+                <div class="task-title-mobile">${task.title}</div>
                 <div class="task-actions">
                     <button class="delete-btn" data-id="${task.id}" data-permanent="true">×</button>
                 </div>
@@ -338,7 +338,7 @@ class TaskManager {
             ` : `
             <div class="task-number">#${task.number}</div>
             <div class="task-content-wrapper">
-                <div class="task-title" data-id="${task.id}">${task.title}</div>
+                <div class="task-title">${task.title}</div>
                 ${descriptionHtml}
             </div>
             <div class="task-actions">
@@ -404,16 +404,18 @@ class TaskManager {
 
     setupTaskInteractions(isArchive = false) {
         // Удаляем старые обработчики
-        document.querySelectorAll('.task-title, .task-title-mobile').forEach(el => {
+        document.querySelectorAll('.task').forEach(el => {
             el.replaceWith(el.cloneNode(true));
         });
 
-        // Добавляем новые обработчики
-        document.querySelectorAll('.task-title, .task-title-mobile').forEach(titleEl => {
-            titleEl.addEventListener('click', (e) => {
-                if (e.target.classList.contains('delete-btn')) return;
+        // Добавляем обработчик на весь блок задачи
+        document.querySelectorAll('.task').forEach(taskEl => {
+            taskEl.addEventListener('click', (e) => {
+                // Игнорируем клики по кнопке удаления и её дочерним элементам
+                if (e.target.closest('.delete-btn')) {
+                    return;
+                }
 
-                const taskEl = titleEl.closest('.task');
                 this.toggleTaskDescription(taskEl);
             });
         });

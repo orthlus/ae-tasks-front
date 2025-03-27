@@ -61,9 +61,15 @@
             margin: 0.5rem 0;
             border-radius: 0.5rem;
             cursor: pointer;
+            user-select: none;
             transition: background 0.2s;
             align-items: flex-start;
             border: 1px solid var(--border);
+        }
+
+        .task-actions, .delete-btn {
+            cursor: default;
+            pointer-events: auto;
         }
 
         .task:hover {
@@ -88,8 +94,6 @@
             word-break: break-word;
             overflow-wrap: break-word;
             max-width: 100%;
-            cursor: pointer;
-            user-select: none;
             padding: 4px 0;
             transition: color 0.2s;
         }
