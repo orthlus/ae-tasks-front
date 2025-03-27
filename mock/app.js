@@ -19,6 +19,25 @@ class TaskManager {
         this.render();
         this.checkHash();
         this.focusInput();
+        this.setupAutogrow();
+    }
+
+    setupAutogrow() {
+        const textarea = document.getElementById('taskInput');
+
+        function adjustHeight() {
+            textarea.style.height = 'auto';
+            textarea.style.height = (textarea.scrollHeight) + 'px';
+        }
+
+        textarea.addEventListener('input', adjustHeight);
+        textarea.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' && !e.ctrlKey) {
+                adjustHeight();
+            }
+        });
+
+        adjustHeight();
     }
 
     focusInput() {
@@ -83,6 +102,8 @@ class TaskManager {
         if (taskInput.value.trim()) {
             this.addTask(taskInput.value);
             taskInput.value = '';
+            taskInput.style.height = 'auto';
+            taskInput.style.height = '48px';
             taskInput.focus();
         }
     }

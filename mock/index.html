@@ -305,6 +305,12 @@
         .save-btn:hover {
             opacity: 0.9;
         }
+
+        .autogrow-textarea {
+            overflow-y: hidden;
+            resize: none;
+            transition: height 0.2s ease-out;
+        }
     </style>
 </head>
 <body>
@@ -319,7 +325,7 @@
             <h3>Новая задача</h3>
             <button class="toggle-spoilers" id="toggleAllSpoilers">Развернуть все</button>
         </div>
-        <textarea id="taskInput" placeholder="Введите задачу (Ctrl+Enter для добавления)" aria-label="Поле ввода новой задачи" autocomplete="off"></textarea>
+        <textarea id="taskInput" class="autogrow-textarea" placeholder="Введите задачу (Ctrl+Enter для добавления)" aria-label="Поле ввода новой задачи" autocomplete="off" rows="1"></textarea>
         <button class="save-btn" id="saveBtn">Сохранить задачу</button>
         <div id="tasks"></div>
     </div>
