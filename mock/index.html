@@ -327,6 +327,9 @@
             #taskInput {
                 min-height: 3rem;
                 padding: 0.5rem;
+                -webkit-user-select: text;
+                user-select: text;
+                -webkit-touch-callout: default;
             }
 
             .input-header {
@@ -373,7 +376,17 @@
             <h3>Новая задача</h3>
             <button class="toggle-spoilers" id="toggleAllSpoilers">Развернуть все</button>
         </div>
-        <textarea id="taskInput" class="autogrow-textarea" placeholder="Введите задачу (Ctrl+Enter для добавления)" aria-label="Поле ввода новой задачи" autocomplete="off" rows="1"></textarea>
+        <textarea
+                id="taskInput"
+                class="autogrow-textarea"
+                placeholder="Введите задачу (Ctrl+Enter для добавления)"
+                aria-label="Поле ввода новой задачи"
+                autocomplete="off"
+                autocorrect="off"
+                rows="1"
+                name="task"
+                data-lpignore="true"
+        ></textarea>
         <button class="save-btn" id="saveBtn">Сохранить задачу</button>
         <div id="tasks"></div>
     </div>
