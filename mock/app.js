@@ -276,64 +276,77 @@ class TaskManager {
 
     renderTasks() {
         const container = document.getElementById('tasks');
-        container.innerHTML = this.tasks.map(task => `
+        const isMobile = window.innerWidth <= 600;
+
+        container.innerHTML = this.tasks.map(task => {
+            const descriptionHtml = task.description ? `
+            <div class="task-spoiler">
+                <div class="task-content">${task.description}</div>
+            </div>` : '';
+
+            return `
         <div class="task" data-id="${task.id}">
-            ${window.innerWidth <= 600 ? `
+            ${isMobile ? `
             <div class="task-header-mobile">
                 <div class="task-number">#${task.number}</div>
-                <div class="task-title-mobile">${task.title}</div>
+                <div class="task-title-mobile" data-id="${task.id}">${task.title}</div>
                 <div class="task-actions">
                     <button class="delete-btn" data-id="${task.id}">×</button>
                 </div>
             </div>
+            ${descriptionHtml}
             ` : `
             <div class="task-number">#${task.number}</div>
             <div class="task-content-wrapper">
-                <div class="task-title">${task.title}</div>
-                ${task.description ? `
-                <div class="task-spoiler">
-                    <div class="task-content">${task.description}</div>
-                </div>` : ''}
+                <div class="task-title" data-id="${task.id}">${task.title}</div>
+                ${descriptionHtml}
             </div>
             <div class="task-actions">
                 <button class="delete-btn" data-id="${task.id}">×</button>
             </div>
             `}
-        </div>
-    `).join('');
+        </div>`;
+        }).join('');
+
+        this.setupTaskInteractions();
     }
 
     renderArchived() {
         const container = document.getElementById('archiveTasks');
         const clearArchiveBtn = document.getElementById('clearArchiveBtn');
+        const isMobile = window.innerWidth <= 600;
 
         clearArchiveBtn.style.display = this.archivedTasks.length ? 'block' : 'none';
 
-        container.innerHTML = this.archivedTasks.map(task => `
+        container.innerHTML = this.archivedTasks.map(task => {
+            const descriptionHtml = task.description ? `
+            <div class="task-spoiler">
+                <div class="task-content">${task.description}</div>
+            </div>` : '';
+
+            return `
         <div class="task" data-id="${task.id}">
-            ${window.innerWidth <= 600 ? `
+            ${isMobile ? `
             <div class="task-header-mobile">
                 <div class="task-number">#${task.number}</div>
-                <div class="task-title-mobile">${task.title}</div>
+                <div class="task-title-mobile" data-id="${task.id}">${task.title}</div>
                 <div class="task-actions">
                     <button class="delete-btn" data-id="${task.id}" data-permanent="true">×</button>
                 </div>
             </div>
+            ${descriptionHtml}
             ` : `
             <div class="task-number">#${task.number}</div>
             <div class="task-content-wrapper">
-                <div class="task-title">${task.title}</div>
-                ${task.description ? `
-                <div class="task-spoiler">
-                    <div class="task-content">${task.description}</div>
-                </div>` : ''}
+                <div class="task-title" data-id="${task.id}">${task.title}</div>
+                ${descriptionHtml}
             </div>
             <div class="task-actions">
                 <button class="delete-btn" data-id="${task.id}" data-permanent="true">×</button>
             </div>
             `}
-        </div>
-    `).join('');
+        </div>`;
+        }).join('');
 
         this.setupTaskInteractions(true);
     }
@@ -390,16 +403,24 @@ class TaskManager {
     }
 
     setupTaskInteractions(isArchive = false) {
-        const selector = isArchive ? '#archiveTasks .task' : '.task';
+        // Удаляем старые обработчики
+        document.querySelectorAll('.task-title, .task-title-mobile').forEach(el => {
+            el.replaceWith(el.cloneNode(true));
+        });
 
-        document.querySelectorAll(selector).forEach(taskElement => {
-            taskElement.addEventListener('click', (e) => {
-                if (!e.target.classList.contains('delete-btn') &&
-                    !e.target.closest('.task-actions')) {
-                    const spoiler = taskElement.querySelector('.task-spoiler');
-                    spoiler?.classList.toggle('active');
+        // Добавляем новые обработчики
+        document.querySelectorAll('.task-title, .task-title-mobile').forEach(titleEl => {
+            titleEl.addEventListener('click', (e) => {
+                if (e.target.classList.contains('delete-btn')) return;
 
-                    if (spoiler?.classList.contains('active')) {
+                const taskId = parseInt(titleEl.dataset.id);
+                const taskEl = titleEl.closest('.task');
+                const spoiler = taskEl.querySelector('.task-spoiler');
+
+                if (spoiler) {
+                    spoiler.classList.toggle('active');
+
+                    if (spoiler.classList.contains('active')) {
                         setTimeout(() => {
                             spoiler.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
                         }, 10);
@@ -407,6 +428,17 @@ class TaskManager {
                 }
             });
         });
+    }
+
+    toggleTaskDescription(taskElement) {
+        const spoiler = taskElement.querySelector('.task-spoiler');
+        spoiler?.classList.toggle('active');
+
+        if (spoiler?.classList.contains('active')) {
+            setTimeout(() => {
+                spoiler.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }, 10);
+        }
     }
 }
 
