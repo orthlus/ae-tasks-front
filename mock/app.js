@@ -34,6 +34,22 @@ class TaskManager {
         this.checkHash();
         this.focusInput();
         this.setupAutogrow();
+        this.disableAutoComplete();
+    }
+
+    disableAutoComplete() {
+        const taskInput = document.getElementById('taskInput');
+        taskInput.setAttribute('autocomplete', 'new-password');
+        taskInput.setAttribute('name', 'task-input-' + Date.now());
+        taskInput.setAttribute('data-lpignore', 'true');
+
+        // Для дополнительной защиты от автозаполнения
+        if (navigator.userAgent.match(/Android/i)) {
+            taskInput.setAttribute('readonly', 'true');
+            setTimeout(() => {
+                taskInput.removeAttribute('readonly');
+            }, 100);
+        }
     }
 
     setupConfirmationModal() {
