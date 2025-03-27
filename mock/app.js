@@ -12,6 +12,9 @@ class TaskManager {
         this.setupEventListeners();
         this.setupUserDropdown();
         this.setupToggleAllSpoilers();
+        this.setupMobileSaveButton();
+        this.setupClearArchiveButton();
+        this.setupPasswordModal();
         this.addMockTasks();
         this.render();
         this.checkHash();
@@ -64,6 +67,65 @@ class TaskManager {
                 spoiler.classList.remove('active');
             }
         });
+    }
+
+    setupMobileSaveButton() {
+        const mobileSaveBtn = document.getElementById('mobileSaveBtn');
+        const taskInput = document.getElementById('taskInput');
+
+        mobileSaveBtn.addEventListener('click', () => {
+            if (taskInput.value.trim()) {
+                this.addTask(taskInput.value);
+                taskInput.value = '';
+                taskInput.focus();
+            }
+        });
+    }
+
+    setupClearArchiveButton() {
+        const clearArchiveBtn = document.getElementById('clearArchiveBtn');
+        clearArchiveBtn.addEventListener('click', () => {
+            if (this.archivedTasks.length > 0) {
+                this.showPasswordModal();
+            }
+        });
+    }
+
+    setupPasswordModal() {
+        const passwordModal = document.getElementById('passwordModal');
+        const cancelBtn = document.getElementById('cancelPasswordBtn');
+        const confirmBtn = document.getElementById('confirmPasswordBtn');
+        const passwordInput = document.getElementById('passwordInput');
+
+        const hideModal = () => {
+            passwordModal.style.display = 'none';
+            passwordInput.value = '';
+        };
+
+        cancelBtn.addEventListener('click', hideModal);
+
+        confirmBtn.addEventListener('click', () => {
+            // Здесь должна быть проверка пароля
+            // Для демо просто проверяем, что введен любой пароль
+            if (passwordInput.value.trim()) {
+                this.archivedTasks = [];
+                this.renderArchived();
+                hideModal();
+            } else {
+                alert('Введите пароль');
+            }
+        });
+
+        passwordInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                confirmBtn.click();
+            }
+        });
+    }
+
+    showPasswordModal() {
+        document.getElementById('passwordModal').style.display = 'flex';
+        document.getElementById('passwordInput').focus();
     }
 
     addMockTasks() {
@@ -170,6 +232,10 @@ class TaskManager {
 
     renderArchived() {
         const container = document.getElementById('archiveTasks');
+        const clearArchiveBtn = document.getElementById('clearArchiveBtn');
+
+        clearArchiveBtn.style.display = this.archivedTasks.length ? 'block' : 'none';
+
         container.innerHTML = this.archivedTasks.map(task => `
             <div class="task" data-id="${task.id}">
                 <div class="task-number">#${task.number}</div>

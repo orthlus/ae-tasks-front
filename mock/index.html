@@ -149,6 +149,7 @@
             resize: vertical;
             min-height: 4rem;
             box-sizing: border-box;
+            autocomplete: off;
         }
 
         .delete-btn {
@@ -169,6 +170,86 @@
         #archivePage {
             display: none;
             opacity: 0;
+        }
+
+        .mobile-save-btn {
+            display: none;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 0.75rem;
+            width: 100%;
+            margin-bottom: 1rem;
+            cursor: pointer;
+            font: inherit;
+        }
+
+        .mobile-save-btn:hover {
+            opacity: 0.9;
+        }
+
+        .clear-archive-btn {
+            background: var(--danger);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 0.5rem 1rem;
+            cursor: pointer;
+            font: inherit;
+            margin-bottom: 1rem;
+        }
+
+        .clear-archive-btn:hover {
+            opacity: 0.9;
+        }
+
+        .password-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 100;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .password-modal-content {
+            background: white;
+            padding: 2rem;
+            border-radius: 0.5rem;
+            width: 90%;
+            max-width: 400px;
+        }
+
+        .password-input {
+            width: 100%;
+            padding: 0.75rem;
+            margin: 1rem 0;
+            border: 1px solid var(--border);
+            border-radius: 0.25rem;
+            box-sizing: border-box;
+        }
+
+        .password-modal-buttons {
+            display: flex;
+            justify-content: flex-end;
+            gap: 0.5rem;
+        }
+
+        .password-modal-btn {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .password-modal-confirm {
+            background: var(--danger);
+            color: white;
         }
 
         @media (max-width: 600px) {
@@ -202,6 +283,10 @@
                 align-items: flex-start;
                 gap: 0.5rem;
             }
+
+            .mobile-save-btn {
+                display: block;
+            }
         }
     </style>
 </head>
@@ -217,17 +302,27 @@
             <h3>Новая задача</h3>
             <button class="toggle-spoilers" id="toggleAllSpoilers">Развернуть все</button>
         </div>
-        <textarea
-            id="taskInput"
-            placeholder="Введите задачу (Ctrl+Enter для добавления)"
-            aria-label="Поле ввода новой задачи"
-        ></textarea>
+        <textarea id="taskInput" placeholder="Введите задачу (Ctrl+Enter для добавления)" aria-label="Поле ввода новой задачи" autocomplete="off"></textarea>
+        <button class="mobile-save-btn" id="mobileSaveBtn">Сохранить задачу</button>
         <div id="tasks"></div>
     </div>
 
     <div id="archivePage">
         <a href="#" class="nav-link">← Назад к задачам</a>
+        <button class="clear-archive-btn" id="clearArchiveBtn">Удалить все задачи из архива</button>
         <div id="archiveTasks"></div>
+    </div>
+
+    <div class="password-modal" id="passwordModal">
+        <div class="password-modal-content">
+            <h3>Подтвердите удаление</h3>
+            <p>Введите пароль для удаления всех задач из архива:</p>
+            <input type="password" class="password-input" id="passwordInput" placeholder="Пароль">
+            <div class="password-modal-buttons">
+                <button class="password-modal-btn" id="cancelPasswordBtn">Отмена</button>
+                <button class="password-modal-btn password-modal-confirm" id="confirmPasswordBtn">Удалить</button>
+            </div>
+        </div>
     </div>
 
     <script src="app.js"></script>
