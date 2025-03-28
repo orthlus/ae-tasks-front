@@ -21,7 +21,7 @@
 
     <div class="task-content-wrapper">
       <div class="task-title">{{ task.title }}</div>
-      <div class="task-spoiler" :class="{ active: isExpanded || $store.allSpoilersExpanded }">
+      <div class="task-spoiler" :class="{ active: isExpanded || store.allSpoilersExpanded }">
         <div class="task-content" v-html="processedDescription"></div>
       </div>
     </div>
