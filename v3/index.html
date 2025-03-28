@@ -289,6 +289,18 @@
             font: inherit;
         }
 
+        .task-title, .task-title-mobile, .task-content {
+            user-select: text;
+            -webkit-user-select: text;
+            -moz-user-select: text;
+            -ms-user-select: text;
+        }
+
+        .task-content-wrapper {
+            user-select: text;
+            -webkit-user-select: text;
+        }
+
         @media (hover: none) {
             .task-spoiler {
                 transition: max-height 0.1s ease-out; /* Еще быстрее на мобильных */
