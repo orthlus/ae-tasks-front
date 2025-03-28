@@ -512,8 +512,8 @@ class TaskManager {
         // Добавляем обработчик на весь блок задачи
         document.querySelectorAll('.task').forEach(taskEl => {
             taskEl.addEventListener('click', (e) => {
-                // Игнорируем клики по кнопке удаления и её дочерним элементам
-                if (e.target.closest('.delete-btn')) {
+                // Игнорируем клики по кнопкам удаления и копирования
+                if (e.target.closest('.delete-btn') || e.target.closest('.copy-btn')) {
                     return;
                 }
 
