@@ -61,6 +61,7 @@
             margin: 0.5rem 0;
             border-radius: 0.5rem;
             cursor: pointer;
+            user-select: none;
             transition: background 0.2s;
             align-items: flex-start;
             border: 1px solid var(--border);
@@ -288,13 +289,6 @@
             font: inherit;
         }
 
-        .selectable-text {
-            user-select: text;
-            -webkit-user-select: text;
-            -moz-user-select: text;
-            -ms-user-select: text;
-        }
-
         @media (hover: none) {
             .task-spoiler {
                 transition: max-height 0.1s ease-out; /* Еще быстрее на мобильных */
@@ -328,10 +322,6 @@
 
             .task-title-mobile {
                 flex-grow: 1;
-            }
-
-            .task-title-mobile.selectable-text {
-                padding: 8px 4px;
             }
 
             #taskInput {
