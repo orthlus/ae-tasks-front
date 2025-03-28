@@ -6,6 +6,7 @@ class TaskManager {
         this.archivedTasks = [];
         this.allSpoilersExpanded = false;
         this.apiConfig = window.API_CONFIG;
+        this.isArchiveLoaded = false;
 
         this.handleResize = () => {
             if (window.location.hash === '#archive') {
@@ -61,6 +62,32 @@ class TaskManager {
         }
     }
 
+    async fetchArchivedTasks() {
+        if (this.isArchiveLoaded) return;
+
+        try {
+            const response = await fetch(`${this.apiConfig.BASE_URL}/archive`);
+            const data = await response.json();
+
+            this.archivedTasks = data
+                .sort((a, b) => b.id - a.id)
+                .map(task => {
+                    const [title, ...description] = task.content.split('\n');
+                    return {
+                        id: task.id,
+                        number: task.id,
+                        title: title.trim(),
+                        description: description.join('\n').trim()
+                    };
+                });
+
+            this.isArchiveLoaded = true;
+        } catch (error) {
+            console.error('Ошибка загрузки архива:', error);
+            alert('Не удалось загрузить архивные задачи');
+        }
+    }
+
     setupConfirmationModal() {
         const modal = document.getElementById('confirmationModal');
         const cancelBtn = document.getElementById('modalCancel');
@@ -108,7 +135,8 @@ class TaskManager {
         }
     }
 
-    showArchive() {
+    async showArchive() {
+        await this.fetchArchivedTasks();
         document.getElementById('mainPage').style.display = 'none';
         const archivePage = document.getElementById('archivePage');
         archivePage.style.display = 'block';
@@ -197,13 +225,20 @@ class TaskManager {
 
         cancelBtn.addEventListener('click', hideModal);
 
-        confirmBtn.addEventListener('click', () => {
-            // Здесь должна быть проверка пароля
-            // Для демо просто проверяем, что введен любой пароль
+        confirmBtn.addEventListener('click', async () => {
             if (passwordInput.value.trim()) {
-                this.archivedTasks = [];
-                this.renderArchived();
-                hideModal();
+                try {
+                    await fetch(`${this.apiConfig.BASE_URL}/archive`, {
+                        method: 'DELETE'
+                    });
+                    this.archivedTasks = [];
+                    this.isArchiveLoaded = false;
+                    this.renderArchived();
+                    hideModal();
+                } catch (error) {
+                    console.error('Ошибка очистки архива:', error);
+                    alert('Ошибка при удалении архива');
+                }
             } else {
                 alert('Введите пароль');
             }
@@ -285,7 +320,7 @@ class TaskManager {
 
         try {
             await fetch(`${this.apiConfig.BASE_URL}/archive/${id}`, {method: 'DELETE'});
-            this.archivedTasks = this.archivedTasks.filter(t => t.id !== id);
+            await this.fetchArchivedTasks();
             this.renderArchived();
         } catch (error) {
             console.error('Ошибка удаления:', error);
@@ -346,6 +381,7 @@ class TaskManager {
         clearArchiveBtn.style.display = this.archivedTasks.length ? 'block' : 'none';
 
         container.innerHTML = this.archivedTasks
+            .sort((a, b) => b.id - a.id)
             .map(task => TaskTemplates.taskElement(task, isMobile, true))
             .join('');
 
