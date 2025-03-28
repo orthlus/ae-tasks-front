@@ -1,0 +1,36 @@
+@import './variables.scss';
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 1rem;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.6;
+}
+
+.task {
+  display: flex;
+  gap: 1rem;
+  padding: 0.75rem;
+  margin: 0.5rem 0;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  user-select: none;
+  transition: background 0.2s;
+  align-items: flex-start;
+  border: 1px solid var(--border);
+
+  &:hover {
+    background: var(--hover-bg);
+  }
+}
+
+// Остальные стили из оригинального index.html
