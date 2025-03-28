@@ -1,6 +1,7 @@
 <template>
   <textarea
     id="taskInput"
+    ref="textareaEl"
     class="autogrow-textarea"
     v-model="content"
     @keydown.ctrl.enter="handleSubmit"
@@ -10,27 +11,21 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref } from 'vue'
 import { useTaskStore } from '@/stores/taskStore'
+import { useAutogrow } from '@/composables/useAutogrow'
 
 const content = ref('')
+const textareaEl = ref<HTMLTextAreaElement | null>(null)
 const store = useTaskStore()
 
-const adjustHeight = (el: HTMLTextAreaElement) => {
-  el.style.height = 'auto'
-  el.style.height = `${el.scrollHeight}px`
-}
+const { adjustHeight } = useAutogrow(textareaEl)
 
 const handleSubmit = async () => {
   if (content.value.trim()) {
     await store.addTask(content.value)
     content.value = ''
+    adjustHeight()
   }
 }
-
-onMounted(() => {
-  const textarea = document.getElementById('taskInput') as HTMLTextAreaElement
-  textarea.addEventListener('input', () => adjustHeight(textarea))
-  adjustHeight(textarea)
-})
 </script>
