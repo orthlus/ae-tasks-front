@@ -2,11 +2,11 @@ FROM nginx:alpine
 WORKDIR /app
 
 #COPY dist/ .
-COPY v5/dist .
+COPY dist .
 
-COPY v5/package.json .
-COPY v5/vite.config.ts .
-COPY v5/yarn.lock .
+COPY package.json .
+COPY vite.config.ts .
+COPY yarn.lock .
 
 COPY config.js .
 COPY .env.production .
