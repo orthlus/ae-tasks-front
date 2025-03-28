@@ -214,7 +214,6 @@ class TaskManager {
 
     render() {
         this.renderTasks();
-        this.setupTaskInteractions();
     }
 
     renderTasks() {
