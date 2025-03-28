@@ -238,6 +238,12 @@ class TaskManager {
     }
 
     setupTaskInteractions() {
+        // Удаляем старые обработчики
+        document.querySelectorAll('.task').forEach(el => {
+            el.replaceWith(el.cloneNode(true));
+        });
+
+        // Добавляем новые обработчики для всех задач
         document.querySelectorAll('.task').forEach(taskEl => {
             taskEl.addEventListener('click', (e) => {
                 if (e.target.closest('.delete-btn, .copy-btn') ||
@@ -248,6 +254,7 @@ class TaskManager {
             });
         });
 
+        // Обработчики для кнопок копирования
         document.querySelectorAll('.copy-btn').forEach(btn => {
             btn.addEventListener('click', (e) => this.handleCopyButton(e, btn));
         });
@@ -276,13 +283,17 @@ class TaskManager {
         const spoiler = taskElement.querySelector('.task-spoiler');
         if (!spoiler) return;
 
+        const wasActive = spoiler.classList.contains('active');
         spoiler.classList.toggle('active');
-        if (spoiler.classList.contains('active')) {
+
+        if (spoiler.classList.contains('active') && !wasActive) {
             const isMobile = this.isMobile();
-            setTimeout(() => spoiler.scrollIntoView({
-                behavior: 'smooth',
-                block: isMobile ? 'center' : 'nearest'
-            }), 50);
+            setTimeout(() => {
+                spoiler.scrollIntoView({
+                    behavior: 'smooth',
+                    block: isMobile ? 'center' : 'nearest'
+                });
+            }, 50);
         }
     }
 
@@ -303,6 +314,8 @@ class TaskManager {
         container.innerHTML = this.archivedTasks
             .map(task => TaskTemplates.taskElement(task, this.isMobile(), true))
             .join('');
+
+        this.setupTaskInteractions();
 
         document.getElementById('clearArchiveBtn').style.display =
             this.archivedTasks.length ? 'block' : 'none';

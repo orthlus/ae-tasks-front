@@ -8,8 +8,8 @@ const TaskTemplates = {
 
         return `
             <div class="task" data-id="${task.id}">
-                ${isMobile ? this.mobileTaskHtml(task, descriptionHtml, isArchive) 
-                          : this.desktopTaskHtml(task, descriptionHtml, isArchive)}
+                ${isMobile ? this.mobileTaskHtml(task, descriptionHtml, isArchive)
+                : this.desktopTaskHtml(task, descriptionHtml, isArchive)}
             </div>`;
     },
 
