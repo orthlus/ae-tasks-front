@@ -64,18 +64,6 @@ const TaskTemplates = {
             '<a href="$1" target="_blank" rel="noopener noreferrer">$1</a>'
         );
     },
-
-    confirmationModal() {
-        return `<div class="confirmation-modal" id="confirmationModal">
-            <div class="modal-content">
-                <p>Вы уверены, что хотите удалить эту задачу?</p>
-                <div class="modal-actions">
-                    <button class="modal-btn modal-cancel" id="modalCancel">Отмена</button>
-                    <button class="modal-btn modal-confirm" id="modalConfirm">Удалить</button>
-                </div>
-            </div>
-        </div>`;
-    }
 };
 
 export default TaskTemplates;
