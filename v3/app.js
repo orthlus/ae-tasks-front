@@ -1,3 +1,5 @@
+import TaskTemplates from './templates.js';
+
 class TaskManager {
     constructor() {
         this.tasks = [];
@@ -329,61 +331,10 @@ class TaskManager {
         const container = document.getElementById('tasks');
         const isMobile = window.innerWidth <= 600;
 
-        const sortedTasks = [...this.tasks].sort((a, b) => b.id - a.id);
-
-        container.innerHTML = sortedTasks.map(task => {
-            let description = task.description;
-            if (description) {
-                description = description.replace(
-                    /(https?:\/\/[^\s]+)/g,
-                    '<a href="$1" target="_blank" rel="noopener noreferrer">$1</a>'
-                );
-            }
-
-            const descriptionHtml = description ? `
-            <div class="task-spoiler">
-                <div class="task-content">${description}</div>
-            </div>` : '';
-
-            return `
-        <div class="task" data-id="${task.id}">
-            ${isMobile ? `
-            <div class="task-header-mobile">
-                <div class="task-number-wrapper">
-                    <div class="task-number">#${task.id}</div>
-                    <button class="copy-btn" data-id="${task.id}" title="Копировать задачу">
-                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
-                            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
-                        </svg>
-                    </button>
-                </div>
-                <div class="task-title-mobile">${task.title}</div>
-                <div class="task-actions">
-                    <button class="delete-btn" data-id="${task.id}">×</button>
-                </div>
-            </div>
-            ${descriptionHtml}
-            ` : `
-            <div class="task-number-wrapper">
-                <div class="task-number">#${task.id}</div>
-                <button class="copy-btn" data-id="${task.id}" title="Копировать задачу">
-                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
-                        <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
-                    </svg>
-                </button>
-            </div>
-            <div class="task-content-wrapper">
-                <div class="task-title">${task.title}</div>
-                ${descriptionHtml}
-            </div>
-            <div class="task-actions">
-                <button class="delete-btn" data-id="${task.id}">×</button>
-            </div>
-            `}
-        </div>`;
-        }).join('');
+        container.innerHTML = this.tasks
+            .sort((a, b) => b.id - a.id)
+            .map(task => TaskTemplates.taskElement(task, isMobile))
+            .join('');
 
         this.setupTaskInteractions();
     }
@@ -395,59 +346,9 @@ class TaskManager {
 
         clearArchiveBtn.style.display = this.archivedTasks.length ? 'block' : 'none';
 
-        container.innerHTML = this.archivedTasks.map(task => {
-            let description = task.description;
-            if (description) {
-                description = description.replace(
-                    /(https?:\/\/[^\s]+)/g,
-                    '<a href="$1" target="_blank" rel="noopener noreferrer">$1</a>'
-                );
-            }
-
-            const descriptionHtml = description ? `
-            <div class="task-spoiler">
-                <div class="task-content">${description}</div>
-            </div>` : '';
-
-            return `
-        <div class="task" data-id="${task.id}">
-            ${isMobile ? `
-            <div class="task-header-mobile">
-                <div class="task-number-wrapper">
-                    <div class="task-number">#${task.id}</div>
-                    <button class="copy-btn" data-id="${task.id}" title="Копировать задачу">
-                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
-                            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
-                        </svg>
-                    </button>
-                </div>
-                <div class="task-title-mobile">${task.title}</div>
-                <div class="task-actions">
-                    <button class="delete-btn" data-id="${task.id}" data-permanent="true">×</button>
-                </div>
-            </div>
-            ${descriptionHtml}
-            ` : `
-            <div class="task-number-wrapper">
-                <div class="task-number">#${task.id}</div>
-                <button class="copy-btn" data-id="${task.id}" title="Копировать задачу">
-                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
-                        <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
-                    </svg>
-                </button>
-            </div>
-            <div class="task-content-wrapper">
-                <div class="task-title">${task.title}</div>
-                ${descriptionHtml}
-            </div>
-            <div class="task-actions">
-                <button class="delete-btn" data-id="${task.id}" data-permanent="true">×</button>
-            </div>
-            `}
-        </div>`;
-        }).join('');
+        container.innerHTML = this.archivedTasks
+            .map(task => TaskTemplates.taskElement(task, isMobile, true))
+            .join('');
 
         this.setupTaskInteractions(true);
     }
