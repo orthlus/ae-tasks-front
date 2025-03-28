@@ -232,7 +232,6 @@ class TaskManager {
                         method: 'DELETE'
                     });
                     this.archivedTasks = [];
-                    this.isArchiveLoaded = false;
                     this.renderArchived();
                     hideModal();
                 } catch (error) {
@@ -320,10 +319,11 @@ class TaskManager {
 
         try {
             await fetch(`${this.apiConfig.BASE_URL}/archive/${id}`, {method: 'DELETE'});
-            await this.fetchArchivedTasks();
+            this.archivedTasks = this.archivedTasks.filter(t => t.id !== id);
             this.renderArchived();
         } catch (error) {
             console.error('Ошибка удаления:', error);
+            alert('Не удалось удалить задачу из архива');
         }
     }
 
