@@ -350,6 +350,7 @@ class TaskManager {
             ${isMobile ? `
             <div class="task-header-mobile">
                 <div class="task-number">#${task.id}</div>
+                <button class="copy-btn" data-id="${task.id}" title="Копировать задачу">⎘</button>
                 <div class="task-title-mobile">${task.title}</div>
                 <div class="task-actions">
                     <button class="delete-btn" data-id="${task.id}">×</button>
@@ -358,6 +359,7 @@ class TaskManager {
             ${descriptionHtml}
             ` : `
             <div class="task-number">#${task.id}</div>
+            <button class="copy-btn" data-id="${task.id}" title="Копировать задачу">⎘</button>
             <div class="task-content-wrapper">
                 <div class="task-title">${task.title}</div>
                 ${descriptionHtml}
@@ -398,6 +400,7 @@ class TaskManager {
             ${isMobile ? `
             <div class="task-header-mobile">
                 <div class="task-number">#${task.id}</div>
+                <button class="copy-btn" data-id="${task.id}" title="Копировать задачу">⎘</button>
                 <div class="task-title-mobile">${task.title}</div>
                 <div class="task-actions">
                     <button class="delete-btn" data-id="${task.id}" data-permanent="true">×</button>
@@ -406,6 +409,7 @@ class TaskManager {
             ${descriptionHtml}
             ` : `
             <div class="task-number">#${task.id}</div>
+            <button class="copy-btn" data-id="${task.id}" title="Копировать задачу">⎘</button>
             <div class="task-content-wrapper">
                 <div class="task-title">${task.title}</div>
                 ${descriptionHtml}
@@ -486,6 +490,29 @@ class TaskManager {
                 }
 
                 this.toggleTaskDescription(taskEl);
+            });
+        });
+        document.querySelectorAll('.copy-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const taskId = parseInt(btn.dataset.id);
+                const tasksList = window.location.hash === '#archive' ? this.archivedTasks : this.tasks;
+                const task = tasksList.find(t => t.id === taskId);
+
+                if (task) {
+                    const content = `${task.title}${task.description ? '\n' + task.description : ''}`;
+                    navigator.clipboard.writeText(content)
+                        .then(() => {
+                            const originalText = btn.textContent;
+                            btn.textContent = '✓';
+                            setTimeout(() => {
+                                btn.textContent = originalText;
+                            }, 2000);
+                        })
+                        .catch(err => {
+                            console.error('Ошибка копирования:', err);
+                        });
+                }
             });
         });
     }
