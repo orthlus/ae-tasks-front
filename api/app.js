@@ -2,8 +2,8 @@ class TaskManager {
     constructor() {
         this.tasks = [];
         this.archivedTasks = [];
-        this.currentId = 1;
         this.allSpoilersExpanded = false;
+        this.apiConfig = window.API_CONFIG;
 
         this.handleResize = () => {
             if (window.location.hash === '#archive') {
@@ -21,7 +21,7 @@ class TaskManager {
         this.setupConfirmationModal();
     }
 
-    init() {
+    async init() {
         this.setupNavigation();
         this.setupEventListeners();
         this.setupUserDropdown();
@@ -29,11 +29,21 @@ class TaskManager {
         this.setupSaveButton();
         this.setupClearArchiveButton();
         this.setupPasswordModal();
-        this.addMockTasks();
+        await this.fetchTasks();
         this.render();
         this.checkHash();
         this.focusInput();
         this.setupAutogrow();
+    }
+
+    async fetchTasks() {
+        try {
+            const response = await fetch('${this.apiConfig.BASE_URL}/tasks');
+            this.tasks = await response.json();
+            this.render();
+        } catch (error) {
+            console.error('Ошибка загрузки задач:', error);
+        }
     }
 
     setupConfirmationModal() {
@@ -129,8 +139,17 @@ class TaskManager {
         const saveBtn = document.getElementById('saveBtn');
         const taskInput = document.getElementById('taskInput');
 
-        saveBtn.addEventListener('click', () => {
-            this.saveTask();
+        saveBtn.addEventListener('click', async () => {
+            if (taskInput.value.trim()) {
+                await this.addTask(taskInput.value);
+            }
+        });
+
+        taskInput.addEventListener('keydown', async e => {
+            if (e.ctrlKey && e.key === 'Enter' && taskInput.value.trim()) {
+                e.preventDefault();
+                await this.addTask(taskInput.value);
+            }
         });
     }
 
@@ -186,58 +205,78 @@ class TaskManager {
         });
     }
 
+    async addTask(content) {
+        const taskInput = document.getElementById('taskInput');
+        const saveBtn = document.getElementById('saveBtn');
+
+        try {
+            // Блокируем кнопку и поле ввода на время отправки
+            saveBtn.disabled = true;
+            taskInput.disabled = true;
+            saveBtn.textContent = 'Сохранение...';
+
+            const [title, ...description] = content.split('\n');
+            const response = await fetch(`${this.apiConfig.BASE_URL}/tasks`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    title: title.trim(),
+                    description: description.join('\n').trim()
+                })
+            });
+
+            if (!response.ok) throw new Error('Ошибка сохранения');
+
+            const newTask = await response.json();
+
+            // Добавляем задачу в начало списка
+            this.tasks.unshift({
+                id: newTask.id,
+                number: newTask.number,
+                title: newTask.title,
+                description: newTask.description,
+                createdAt: new Date(newTask.createdAt)
+            });
+
+            this.render();
+            taskInput.value = '';
+            taskInput.style.height = '48px';
+        } catch (error) {
+            console.error('Ошибка:', error);
+            alert('Не удалось сохранить задачу. Проверьте соединение и повторите попытку.');
+        } finally {
+            saveBtn.disabled = false;
+            taskInput.disabled = false;
+            saveBtn.textContent = 'Сохранить задачу';
+            taskInput.focus();
+        }
+    }
+
     showPasswordModal() {
         document.getElementById('passwordModal').style.display = 'flex';
         document.getElementById('passwordInput').focus();
     }
 
-    addMockTasks() {
-        const mockTasks = [
-            'Заплатить за интернет\nСрок до 15 числа\nСумма: 500 руб.',
-            'Купить продукты\nМолоко, хлеб, яйца, фрукты',
-            'Очень длинное название задачи, которое должно переноситься на несколько строк\nДетали задачи\nДополнительная информация\n'.repeat(10),
-            'Подготовить отчет\nЕженедельный отчет по продажам\nДанные за последнюю неделю\nАнализ динамики\nВыводы и рекомендации',
-            'Позвонить клиенту\nИванов Иван\nОбсудить новый проект\nУточнить сроки',
-            'спойлер::Секретная информация\nДетали проекта X\nБюджет: 1 000 000 руб.\nСроки: до конца квартала',
-            'Обновить резюме\nДобавить последний опыт работы\nОбновить навыки\nПроверить контакты',
-            'Записаться к врачу\nТерапевт\nДата: следующая неделя\nВзять медицинскую карту',
-            'Изучить новый фреймворк\nReact 18\nНовые фичи\nДокументация\nПрактические примеры',
-            'Планерка\nЕжедневная встреча в 10:00\nПодготовить список вопросов\nОбсудить текущие задачи',
-            'Ремонт в квартире\nСоставить смету\nВыбрать материалы\nНайти рабочих\nСрок: до конца месяца',
-            'Отправить документы\nСканы паспорта\nИНН\nДиплом\nНа почту hr@company.com',
-            'Книга для чтения\n"Чистый код" Роберт Мартин\nГлавы 5-8\nСделать заметки',
-            'Фитнес\nТренировка в 19:00\nРазминка\nОсновной блок\nЗаминка',
-            'Подарок на день рождения\nВыбрать подарок коллеге\nУпаковка\nОткрытка',
-            'Резервное копирование\nВажные документы\nФото\nНастройки приложений\nНа внешний диск'
-        ]
-        mockTasks.forEach(task => this.addTask(task));
-    }
-
-    addTask(content) {
-        const [title, ...description] = content.split('\n');
-        const task = {
-            id: this.currentId++,
-            title: title.trim(),
-            description: description.join('\n'),
-            number: this.currentId - 1,
-            createdAt: new Date()
-        };
-        this.tasks.unshift(task);
-        this.render();
-    }
-
-    deleteTask(id) {
-        const task = this.tasks.find(t => t.id === id);
-        if (task) {
-            this.archivedTasks.unshift(task);
+    async deleteTask(id) {
+        try {
+            await fetch(`${this.apiConfig.BASE_URL}/tasks/${id}`, {method: 'DELETE'});
             this.tasks = this.tasks.filter(t => t.id !== id);
             this.render();
+        } catch (error) {
+            console.error('Ошибка удаления:', error);
         }
     }
 
-    permanentlyDeleteTask(id) {
-        this.archivedTasks = this.archivedTasks.filter(t => t.id !== id);
-        this.renderArchived();
+    async permanentlyDeleteTask(id) {
+        try {
+            await fetch(`${this.apiConfig.BASE_URL}/archive/${id}`, {method: 'DELETE'});
+            this.archivedTasks = this.archivedTasks.filter(t => t.id !== id);
+            this.renderArchived();
+        } catch (error) {
+            console.error('Ошибка удаления:', error);
+        }
     }
 
     setupNavigation() {
