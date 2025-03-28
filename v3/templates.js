@@ -45,7 +45,7 @@ const TaskTemplates = {
 
     deleteButton(id, isArchive) {
         return `<button class="delete-btn" data-id="${id}" 
-                  ${isArchive ? 'data-permanent="true"' : ''}>×</button>`;
+              data-permanent="${isArchive}">×</button>`;
     },
 
     copyButton(id) {

@@ -73,11 +73,7 @@ class TaskManager {
 
         confirmBtn.addEventListener('click', () => {
             if (this.taskToDelete) {
-                if (this.isPermanentDelete) {
-                    this.permanentlyDeleteTask(this.taskToDelete);
-                } else {
-                    this.deleteTask(this.taskToDelete);
-                }
+                this.deleteTask(this.taskToDelete);
             }
             modal.style.display = 'none';
             this.taskToDelete = null;
@@ -284,6 +280,9 @@ class TaskManager {
     }
 
     async permanentlyDeleteTask(id) {
+        const isDesktop = window.innerWidth > 600;
+        if (!isDesktop) return;
+
         try {
             await fetch(`${this.apiConfig.BASE_URL}/archive/${id}`, {method: 'DELETE'});
             this.archivedTasks = this.archivedTasks.filter(t => t.id !== id);
@@ -373,10 +372,23 @@ class TaskManager {
                 e.preventDefault();
                 e.stopPropagation();
 
-                this.taskToDelete = parseInt(e.target.dataset.id);
-                this.isPermanentDelete = e.target.dataset.permanent === 'true';
+                const isMobile = window.innerWidth <= 600;
+                const taskId = parseInt(e.target.dataset.id);
+                const isPermanent = e.target.dataset.permanent === 'true';
 
-                document.getElementById('confirmationModal').style.display = 'flex';
+                if (isMobile) {
+                    // Для мобильных - показ модалки
+                    this.taskToDelete = taskId;
+                    this.isPermanentDelete = isPermanent;
+                    document.getElementById('confirmationModal').style.display = 'flex';
+                } else {
+                    // Для десктопа - мгновенное удаление
+                    if (isPermanent) {
+                        this.permanentlyDeleteTask(taskId);
+                    } else {
+                        this.deleteTask(taskId);
+                    }
+                }
             }
 
             if (e.target.classList.contains('confirmation-modal')) {
