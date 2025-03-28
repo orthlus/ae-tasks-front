@@ -38,8 +38,20 @@ class TaskManager {
 
     async fetchTasks() {
         try {
-            const response = await fetch('${this.apiConfig.BASE_URL}/tasks');
-            this.tasks = await response.json();
+            const response = await fetch(`${this.apiConfig.BASE_URL}/tasks`);
+            const data = await response.json();
+
+            this.tasks = data.map(task => {
+                const [title, ...description] = task.content.split('\n');
+                return {
+                    id: task.id,
+                    number: task.id,
+                    title: title.trim(),
+                    description: description.join('\n').trim(),
+                    createdAt: new Date()
+                };
+            });
+
             this.render();
         } catch (error) {
             console.error('Ошибка загрузки задач:', error);
@@ -215,15 +227,13 @@ class TaskManager {
             taskInput.disabled = true;
             saveBtn.textContent = 'Сохранение...';
 
-            const [title, ...description] = content.split('\n');
             const response = await fetch(`${this.apiConfig.BASE_URL}/tasks`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
-                    title: title.trim(),
-                    description: description.join('\n').trim()
+                    content: content // отправляем полный текст как есть
                 })
             });
 
@@ -234,9 +244,9 @@ class TaskManager {
             // Добавляем задачу в начало списка
             this.tasks.unshift({
                 id: newTask.id,
-                number: newTask.number,
-                title: newTask.title,
-                description: newTask.description,
+                number: newTask.id,
+                title: content.split('\n')[0].trim(),
+                description: content.split('\n').slice(1).join('\n').trim(),
                 createdAt: new Date(newTask.createdAt)
             });
 
@@ -327,7 +337,7 @@ class TaskManager {
         <div class="task" data-id="${task.id}">
             ${isMobile ? `
             <div class="task-header-mobile">
-                <div class="task-number">#${task.number}</div>
+                <div class="task-number">#${task.id}</div>
                 <div class="task-title-mobile">${task.title}</div>
                 <div class="task-actions">
                     <button class="delete-btn" data-id="${task.id}">×</button>
@@ -335,7 +345,7 @@ class TaskManager {
             </div>
             ${descriptionHtml}
             ` : `
-            <div class="task-number">#${task.number}</div>
+            <div class="task-number">#${task.id}</div>
             <div class="task-content-wrapper">
                 <div class="task-title">${task.title}</div>
                 ${descriptionHtml}
@@ -367,7 +377,7 @@ class TaskManager {
         <div class="task" data-id="${task.id}">
             ${isMobile ? `
             <div class="task-header-mobile">
-                <div class="task-number">#${task.number}</div>
+                <div class="task-number">#${task.id}</div>
                 <div class="task-title-mobile">${task.title}</div>
                 <div class="task-actions">
                     <button class="delete-btn" data-id="${task.id}" data-permanent="true">×</button>
@@ -375,7 +385,7 @@ class TaskManager {
             </div>
             ${descriptionHtml}
             ` : `
-            <div class="task-number">#${task.number}</div>
+            <div class="task-number">#${task.id}</div>
             <div class="task-content-wrapper">
                 <div class="task-title">${task.title}</div>
                 ${descriptionHtml}
