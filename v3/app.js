@@ -413,6 +413,10 @@ class TaskManager {
         // Добавляем обработчик на весь блок задачи
         document.querySelectorAll('.task').forEach(taskEl => {
             taskEl.addEventListener('click', (e) => {
+                const selection = window.getSelection();
+                if (selection.toString().length > 0) {
+                    return;
+                }
                 // Игнорируем клики по кнопке удаления и её дочерним элементам
                 if (e.target.closest('.delete-btn')) {
                     return;

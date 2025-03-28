@@ -20,7 +20,7 @@ const TaskTemplates = {
                     <div class="task-number">#${task.id}</div>
                     ${this.copyButton(task.id)}
                 </div>
-                <div class="task-title-mobile">${task.title}</div>
+                <div class="task-title-mobile selectable-text">${task.title}</div>
                 <div class="task-actions">
                     ${this.deleteButton(task.id, isArchive)}
                 </div>
@@ -35,8 +35,11 @@ const TaskTemplates = {
                 ${this.copyButton(task.id)}
             </div>
             <div class="task-content-wrapper">
-                <div class="task-title">${task.title}</div>
-                ${descriptionHtml}
+                <div class="task-title selectable-text">${task.title}</div>
+                ${descriptionHtml ? `
+                <div class="task-spoiler">
+                    <div class="task-content selectable-text">${descriptionHtml}</div>
+                </div>` : ''}
             </div>
             <div class="task-actions">
                 ${this.deleteButton(task.id, isArchive)}
