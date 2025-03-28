@@ -240,12 +240,12 @@ class TaskManager {
 
             if (!response.ok) throw new Error('Ошибка сохранения');
 
-            const newTask = await response.json();
+            const newTaskId = await response;
 
             // Добавляем задачу в начало списка
             this.tasks.unshift({
-                id: newTask.id,
-                number: newTask.id,
+                id: newTaskId,
+                number: newTaskId,
                 title: content.split('\n')[0].trim(),
                 description: content.split('\n').slice(1).join('\n').trim()
             });
