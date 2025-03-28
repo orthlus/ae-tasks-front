@@ -496,11 +496,11 @@ class TaskManager {
             btn.addEventListener('click', (e) => {
                 e.stopPropagation();
                 const taskId = parseInt(btn.dataset.id);
-                const tasksList = window.location.hash === '#archive' ? this.archivedTasks : this.tasks;
+                const tasksList = isArchive ? this.archivedTasks : this.tasks;
                 const task = tasksList.find(t => t.id === taskId);
 
                 if (task) {
-                    const content = `${task.title}${task.description ? '\n' + task.description : ''}`;
+                    const content = `${task.title}${task.description ? '\n' + task.description.replace(/<[^>]*>?/gm, '') : ''}`;
                     navigator.clipboard.writeText(content)
                         .then(() => {
                             const originalText = btn.textContent;
