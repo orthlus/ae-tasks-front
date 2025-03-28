@@ -41,16 +41,18 @@ class TaskManager {
             const response = await fetch(`${this.apiConfig.BASE_URL}/tasks`);
             const data = await response.json();
 
-            this.tasks = data.map(task => {
-                const [title, ...description] = task.content.split('\n');
-                return {
-                    id: task.id,
-                    number: task.id,
-                    title: title.trim(),
-                    description: description.join('\n').trim(),
-                    createdAt: new Date()
-                };
-            });
+            this.tasks = data
+                .sort((a, b) => b.id - a.id)
+                .map(task => {
+                    const [title, ...description] = task.content.split('\n');
+                    return {
+                        id: task.id,
+                        number: task.id,
+                        title: title.trim(),
+                        description: description.join('\n').trim(),
+                        createdAt: new Date()
+                    };
+                });
 
             this.render();
         } catch (error) {
@@ -250,6 +252,8 @@ class TaskManager {
                 createdAt: new Date(newTask.createdAt)
             });
 
+            this.tasks.sort((a, b) => b.id - a.id);
+
             this.render();
             taskInput.value = '';
             taskInput.style.height = '48px';
@@ -327,7 +331,9 @@ class TaskManager {
         const container = document.getElementById('tasks');
         const isMobile = window.innerWidth <= 600;
 
-        container.innerHTML = this.tasks.map(task => {
+        const sortedTasks = [...this.tasks].sort((a, b) => b.id - a.id);
+
+        container.innerHTML = sortedTasks.map(task => {
             const descriptionHtml = task.description ? `
             <div class="task-spoiler">
                 <div class="task-content">${task.description}</div>
