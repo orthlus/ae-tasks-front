@@ -49,8 +49,7 @@ class TaskManager {
                         id: task.id,
                         number: task.id,
                         title: title.trim(),
-                        description: description.join('\n').trim(),
-                        createdAt: new Date()
+                        description: description.join('\n').trim()
                     };
                 });
 
@@ -248,8 +247,7 @@ class TaskManager {
                 id: newTask.id,
                 number: newTask.id,
                 title: content.split('\n')[0].trim(),
-                description: content.split('\n').slice(1).join('\n').trim(),
-                createdAt: new Date(newTask.createdAt)
+                description: content.split('\n').slice(1).join('\n').trim()
             });
 
             this.tasks.sort((a, b) => b.id - a.id);
