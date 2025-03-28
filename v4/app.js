@@ -85,7 +85,10 @@ class TaskManager {
 
         confirmBtn.addEventListener('click', async () => {
             if (this.taskToDelete) {
-                await this.deleteTask(this.taskToDelete);
+                await this.deleteTask(
+                    this.taskToDelete.id,
+                    this.taskToDelete.isPermanent
+                );
                 modal.style.display = 'none';
                 this.taskToDelete = null;
             }
@@ -147,6 +150,14 @@ class TaskManager {
         });
     }
 
+    safeParse(jsonString) {
+        try {
+            return JSON.parse(jsonString);
+        } catch (e) {
+            return null;
+        }
+    }
+
     async addTask(content) {
         const taskInput = document.getElementById('taskInput');
         const saveBtn = document.getElementById('saveBtn');
@@ -162,10 +173,16 @@ class TaskManager {
                 body: JSON.stringify({content})
             });
 
-            if (!response.ok) throw new Error('Ошибка сохранения');
+            const responseBody = await response.text();
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            const responseData = this.safeParse(responseBody) || {id: Date.now()};
 
             const newTask = this.parseTask({
-                id: Number(await response.text()),
+                id: responseData.id || Number(responseBody),
                 content
             });
 
@@ -174,8 +191,8 @@ class TaskManager {
             taskInput.value = '';
             taskInput.style.height = '48px';
         } catch (error) {
-            console.error('Ошибка:', error);
-            alert('Не удалось сохранить задачу');
+            console.error('Полная ошибка сохранения:', error);
+            alert(`Ошибка сохранения: ${error.message}`);
         } finally {
             saveBtn.disabled = false;
             taskInput.disabled = false;
@@ -184,13 +201,21 @@ class TaskManager {
         }
     }
 
-    async deleteTask(id) {
+    async deleteTask(id, isPermanent = false) {
         try {
-            await fetch(`${this.apiConfig.BASE_URL}/tasks/${id}`, {method: 'DELETE'});
-            this.tasks = this.tasks.filter(t => t.id !== id);
-            this.render();
+            const endpoint = isPermanent ? `/archive/${id}` : `/tasks/${id}`;
+            await fetch(`${this.apiConfig.BASE_URL}${endpoint}`, {method: 'DELETE'});
+
+            if (isPermanent) {
+                this.archivedTasks = this.archivedTasks.filter(t => t.id !== id);
+                this.renderArchived();
+            } else {
+                this.tasks = this.tasks.filter(t => t.id !== id);
+                this.render();
+            }
         } catch (error) {
             console.error('Ошибка удаления:', error);
+            alert(`Не удалось удалить задачу: ${error.message}`);
         }
     }
 
@@ -212,8 +237,58 @@ class TaskManager {
         document.addEventListener('click', () => logoutBtn.classList.remove('visible'));
     }
 
+    setupTaskInteractions() {
+        document.querySelectorAll('.task').forEach(taskEl => {
+            taskEl.addEventListener('click', (e) => {
+                if (e.target.closest('.delete-btn, .copy-btn') ||
+                    window.getSelection().toString().length > 0) {
+                    return;
+                }
+                this.toggleTaskDescription(taskEl);
+            });
+        });
+
+        document.querySelectorAll('.copy-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => this.handleCopyButton(e, btn));
+        });
+    }
+
+    handleCopyButton(e, btn) {
+        e.stopPropagation();
+        const taskId = parseInt(btn.dataset.id);
+        const tasksList = window.location.hash === '#archive'
+            ? this.archivedTasks
+            : this.tasks;
+        const task = tasksList.find(t => t.id === taskId);
+
+        if (task) {
+            const content = `${task.title}${task.description ? '\n' + task.description : ''}`;
+            navigator.clipboard.writeText(content)
+                .then(() => {
+                    btn.classList.add('copied');
+                    setTimeout(() => btn.classList.remove('copied'), 2000);
+                })
+                .catch(console.error);
+        }
+    }
+
+    toggleTaskDescription(taskElement) {
+        const spoiler = taskElement.querySelector('.task-spoiler');
+        if (!spoiler) return;
+
+        spoiler.classList.toggle('active');
+        if (spoiler.classList.contains('active')) {
+            const isMobile = this.isMobile();
+            setTimeout(() => spoiler.scrollIntoView({
+                behavior: 'smooth',
+                block: isMobile ? 'center' : 'nearest'
+            }), 50);
+        }
+    }
+
     render() {
         this.renderTasks();
+        this.setupTaskInteractions();
     }
 
     renderTasks() {
@@ -250,11 +325,13 @@ class TaskManager {
         document.body.addEventListener('click', e => {
             if (e.target.classList.contains('delete-btn')) {
                 const taskId = parseInt(e.target.dataset.id);
+                const isPermanent = e.target.dataset.permanent === 'true';
+
                 if (this.isMobile()) {
-                    this.taskToDelete = taskId;
+                    this.taskToDelete = {id: taskId, isPermanent};
                     document.getElementById('confirmationModal').style.display = 'flex';
                 } else {
-                    this.deleteTask(taskId);
+                    this.deleteTask(taskId, isPermanent);
                 }
             }
         });
