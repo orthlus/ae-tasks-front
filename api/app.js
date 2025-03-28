@@ -68,7 +68,7 @@ class TaskManager {
         }
 
         textarea.addEventListener('input', adjustHeight);
-        textarea.addEventListener('keydown', function(e) {
+        textarea.addEventListener('keydown', function (e) {
             if (e.key === 'Enter' && !e.ctrlKey) {
                 adjustHeight();
             }
@@ -428,7 +428,7 @@ class TaskManager {
         spoiler.classList.toggle('active');
 
         if (spoiler.classList.contains('active')) {
-            spoiler.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            spoiler.scrollIntoView({behavior: 'smooth', block: 'nearest'});
         }
     }
 }
