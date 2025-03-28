@@ -332,9 +332,17 @@ class TaskManager {
         const sortedTasks = [...this.tasks].sort((a, b) => b.id - a.id);
 
         container.innerHTML = sortedTasks.map(task => {
-            const descriptionHtml = task.description ? `
+            let description = task.description;
+            if (description) {
+                description = description.replace(
+                    /(https?:\/\/[^\s]+)/g,
+                    '<a href="$1" target="_blank" rel="noopener noreferrer">$1</a>'
+                );
+            }
+
+            const descriptionHtml = description ? `
             <div class="task-spoiler">
-                <div class="task-content">${task.description}</div>
+                <div class="task-content">${description}</div>
             </div>` : '';
 
             return `
@@ -372,9 +380,17 @@ class TaskManager {
         clearArchiveBtn.style.display = this.archivedTasks.length ? 'block' : 'none';
 
         container.innerHTML = this.archivedTasks.map(task => {
-            const descriptionHtml = task.description ? `
+            let description = task.description;
+            if (description) {
+                description = description.replace(
+                    /(https?:\/\/[^\s]+)/g,
+                    '<a href="$1" target="_blank" rel="noopener noreferrer">$1</a>'
+                );
+            }
+
+            const descriptionHtml = description ? `
             <div class="task-spoiler">
-                <div class="task-content">${task.description}</div>
+                <div class="task-content">${description}</div>
             </div>` : '';
 
             return `
