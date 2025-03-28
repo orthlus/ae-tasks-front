@@ -459,10 +459,20 @@ class TaskManager {
         const spoiler = taskElement.querySelector('.task-spoiler');
         if (!spoiler) return;
 
+        const wasActive = spoiler.classList.contains('active');
         spoiler.classList.toggle('active');
 
-        if (spoiler.classList.contains('active')) {
-            spoiler.scrollIntoView({behavior: 'smooth', block: 'nearest'});
+        if (spoiler.classList.contains('active') && !wasActive) {
+            const isMobile = window.innerWidth <= 600;
+            const scrollOptions = {
+                behavior: 'smooth',
+                block: isMobile ? 'center' : 'nearest',
+                inline: 'nearest'
+            };
+
+            setTimeout(() => {
+                spoiler.scrollIntoView(scrollOptions);
+            }, 50);
         }
     }
 }
