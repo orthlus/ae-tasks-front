@@ -191,7 +191,7 @@ class TaskManager {
             const response = await fetch(`${this.apiConfig.BASE_URL}/tasks`, {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({content})
+                body: JSON.stringify({content: content.trim()})
             });
 
             const responseBody = await response.text();
@@ -204,7 +204,7 @@ class TaskManager {
 
             const newTask = this.parseTask({
                 id: responseData.id || Number(responseBody),
-                content
+                content: content.trim()
             });
 
             this.tasks.unshift(newTask);
