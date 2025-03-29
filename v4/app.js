@@ -348,6 +348,55 @@ class TaskManager {
                 }
             }
         });
+
+        document.getElementById('clearArchiveBtn').addEventListener('click', () => {
+            document.getElementById('passwordModal').style.display = 'flex';
+        });
+
+        document.getElementById('cancelPasswordBtn').addEventListener('click', () => {
+            document.getElementById('passwordModal').style.display = 'none';
+            document.getElementById('passwordInput').value = '';
+        });
+
+        document.getElementById('confirmPasswordBtn').addEventListener('click', async () => {
+            await this.clearArchive();
+        });
+
+        document.getElementById('passwordInput').addEventListener('keydown', async (e) => {
+            if (e.key === 'Enter') {
+                await this.clearArchive();
+            }
+        });
+    }
+
+    async clearArchive() {
+        const password = document.getElementById('passwordInput').value;
+        if (!password) {
+            alert('Введите пароль');
+            return;
+        }
+
+        try {
+            const response = await fetch(`${this.apiConfig.BASE_URL}/archive`, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${password}`
+                }
+            });
+
+            if (!response.ok) {
+                throw new Error('Неверный пароль');
+            }
+
+            this.archivedTasks = [];
+            this.renderArchived();
+            document.getElementById('passwordModal').style.display = 'none';
+            document.getElementById('passwordInput').value = '';
+        } catch (error) {
+            console.error('Ошибка удаления архива:', error);
+            alert(error.message);
+        }
     }
 }
 
