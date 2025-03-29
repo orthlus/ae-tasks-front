@@ -1,7 +1,11 @@
+// noinspection DuplicatedCode
+
 import TaskTemplates from './templates.js';
 
 class TaskManager {
     constructor() {
+        this.authToken = localStorage.getItem('authToken');
+        this.currentUser = JSON.parse(localStorage.getItem('currentUser'));
         this.tasks = [];
         this.archivedTasks = [];
         this.allSpoilersExpanded = false;
@@ -15,8 +19,45 @@ class TaskManager {
         };
 
         window.addEventListener('resize', this.handleResize);
-        this.init();
+        if (this.authToken) {
+            this.initApp();
+        } else {
+            this.showLogin();
+        }
         this.setupConfirmationModal();
+    }
+
+    showLogin() {
+        document.getElementById('loginPage').style.display = 'block';
+        document.getElementById('header').style.display = 'none';
+        document.getElementById('mainPage').style.display = 'none';
+    }
+
+    async handleLogin(login, password) {
+        try {
+            const response = await fetch(`${this.apiConfig.BASE_URL}${this.apiConfig.AUTH_ENDPOINT}`, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({login, password})
+            });
+
+            const {token, user} = await response.json();
+            localStorage.setItem('authToken', token);
+            localStorage.setItem('currentUser', JSON.stringify(user));
+            this.authToken = token;
+            this.currentUser = user;
+            this.initApp();
+        } catch (error) {
+            alert('Ошибка авторизации');
+        }
+    }
+
+    initApp() {
+        document.getElementById('loginPage').style.display = 'none';
+        document.getElementById('header').style.display = 'flex';
+        document.getElementById('mainPage').style.display = 'block';
+        document.getElementById('username').textContent = this.currentUser?.username;
+        this.init();
     }
 
     async init() {
@@ -33,7 +74,12 @@ class TaskManager {
 
     async fetchTasks() {
         try {
-            const response = await fetch(`${this.apiConfig.BASE_URL}/tasks`);
+            const response = await fetch(`${this.apiConfig.BASE_URL}/tasks`, {
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${this.authToken}`
+                }
+            });
             const data = await response.json();
 
             this.tasks = data
@@ -59,7 +105,12 @@ class TaskManager {
         if (this.isArchiveLoaded) return;
 
         try {
-            const response = await fetch(`${this.apiConfig.BASE_URL}/archive`);
+            const response = await fetch(`${this.apiConfig.BASE_URL}/archive`, {
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${this.authToken}`
+                }
+            });
             const data = await response.json();
 
             this.archivedTasks = data
@@ -190,7 +241,10 @@ class TaskManager {
 
             const response = await fetch(`${this.apiConfig.BASE_URL}/tasks`, {
                 method: 'POST',
-                headers: {'Content-Type': 'application/json'},
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${this.authToken}`
+                },
                 body: JSON.stringify({content: content.trim()})
             });
 
@@ -225,7 +279,13 @@ class TaskManager {
     async deleteTask(id, isPermanent = false) {
         try {
             const endpoint = isPermanent ? `/archive/${id}` : `/tasks/${id}`;
-            await fetch(`${this.apiConfig.BASE_URL}${endpoint}`, {method: 'DELETE'});
+            await fetch(`${this.apiConfig.BASE_URL}${endpoint}`, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${this.authToken}`
+                }
+            });
 
             if (isPermanent) {
                 this.archivedTasks = this.archivedTasks.filter(t => t.id !== id);
@@ -253,6 +313,12 @@ class TaskManager {
         username.addEventListener('click', (e) => {
             e.stopPropagation();
             logoutBtn.classList.toggle('visible');
+        });
+
+        logoutBtn.addEventListener('click', () => {
+            localStorage.removeItem('authToken');
+            localStorage.removeItem('currentUser');
+            window.location.reload();
         });
 
         document.addEventListener('click', () => logoutBtn.classList.remove('visible'));
@@ -373,6 +439,12 @@ class TaskManager {
             if (e.key === 'Enter') {
                 await this.clearArchive();
             }
+        });
+
+        document.getElementById('loginBtn').addEventListener('click', () => {
+            const login = document.getElementById('loginInput').value;
+            const password = document.getElementById('passwordLoginInput').value;
+            this.handleLogin(login, password);
         });
     }
 

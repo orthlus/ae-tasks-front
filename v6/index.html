@@ -422,8 +422,14 @@
     </style>
 </head>
 <body>
-    <div class="header">
-        <span class="username" id="username">Профиль</span>
+    <div id="loginPage" style="display: none;">
+        <h2>Авторизация</h2>
+        <input type="text" id="loginInput" placeholder="Логин" class="password-input">
+        <input type="password" id="passwordLoginInput" placeholder="Пароль" class="password-input">
+        <button class="save-btn" id="loginBtn">Войти</button>
+    </div>
+    <div class="header" style="display: none;">
+        <span class="username" id="username"></span>
         <button class="logout-btn" id="logoutBtn">Выйти</button>
     </div>
 
