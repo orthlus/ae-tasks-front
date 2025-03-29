@@ -11,6 +11,7 @@ class TaskManager {
         this.allSpoilersExpanded = false;
         this.apiConfig = window.API_CONFIG;
         this.isArchiveLoaded = false;
+        this.expandedTaskIds = new Set();
 
         this.handleResize = () => {
             window.location.hash === '#archive'
@@ -373,11 +374,29 @@ class TaskManager {
         }
     }
 
+    restoreExpandedState() {
+        document.querySelectorAll('.task').forEach(taskEl => {
+            const taskId = parseInt(taskEl.dataset.id);
+            const spoiler = taskEl.querySelector('.task-spoiler');
+            if (spoiler && this.expandedTaskIds.has(taskId)) {
+                spoiler.classList.add('active');
+            }
+        });
+    }
+
     toggleTaskDescription(taskElement) {
         const spoiler = taskElement.querySelector('.task-spoiler');
         if (!spoiler) return;
 
+        const taskId = parseInt(taskElement.dataset.id);
         const wasActive = spoiler.classList.contains('active');
+
+        if (wasActive) {
+            this.expandedTaskIds.delete(taskId);
+        } else {
+            this.expandedTaskIds.add(taskId);
+        }
+
         spoiler.classList.toggle('active');
 
         if (spoiler.classList.contains('active') && !wasActive) {
@@ -394,6 +413,7 @@ class TaskManager {
     render() {
         this.renderTasks();
         this.setupTaskInteractions();
+        this.restoreExpandedState();
     }
 
     renderTasks() {
@@ -410,6 +430,7 @@ class TaskManager {
             .join('');
 
         this.setupTaskInteractions();
+        this.restoreExpandedState();
 
         document.getElementById('clearArchiveBtn').style.display =
             this.archivedTasks.length ? 'block' : 'none';
