@@ -436,6 +436,10 @@ class TaskManager {
                 e.preventDefault();
                 await this.addTask(taskInput.value);
             }
+            if (e.shiftKey && e.key === 'Enter' && taskInput.value.trim()) {
+                e.preventDefault();
+                await this.addTask(taskInput.value);
+            }
         });
 
         document.getElementById('clearArchiveBtn').addEventListener('click', () => {
