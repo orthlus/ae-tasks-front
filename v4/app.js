@@ -77,6 +77,7 @@ class TaskManager {
         const modal = document.getElementById('confirmationModal');
         const cancelBtn = document.getElementById('modalCancel');
         const confirmBtn = document.getElementById('modalConfirm');
+        const confirmationText = document.getElementById('confirmationText');
 
         cancelBtn.addEventListener('click', () => {
             modal.style.display = 'none';
@@ -91,6 +92,26 @@ class TaskManager {
                 );
                 modal.style.display = 'none';
                 this.taskToDelete = null;
+            }
+        });
+
+        document.body.addEventListener('click', e => {
+            if (e.target.classList.contains('delete-btn')) {
+                const taskId = parseInt(e.target.dataset.id);
+                const isPermanent = e.target.dataset.permanent === 'true';
+
+                if (this.isMobile()) {
+                    const tasksList = isPermanent ? this.archivedTasks : this.tasks;
+                    const task = tasksList.find(t => t.id === taskId);
+                    if (task) {
+                        confirmationText.textContent =
+                            `Вы уверены, что хотите удалить задачу #${task.id} "${task.title}"?`;
+                    }
+                    this.taskToDelete = {id: taskId, isPermanent};
+                    modal.style.display = 'flex';
+                } else {
+                    this.deleteTask(taskId, isPermanent);
+                }
             }
         });
     }
@@ -332,20 +353,6 @@ class TaskManager {
             if (e.ctrlKey && e.key === 'Enter' && taskInput.value.trim()) {
                 e.preventDefault();
                 await this.addTask(taskInput.value);
-            }
-        });
-
-        document.body.addEventListener('click', e => {
-            if (e.target.classList.contains('delete-btn')) {
-                const taskId = parseInt(e.target.dataset.id);
-                const isPermanent = e.target.dataset.permanent === 'true';
-
-                if (this.isMobile()) {
-                    this.taskToDelete = {id: taskId, isPermanent};
-                    document.getElementById('confirmationModal').style.display = 'flex';
-                } else {
-                    this.deleteTask(taskId, isPermanent);
-                }
             }
         });
 
