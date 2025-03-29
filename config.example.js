@@ -1,6 +1,5 @@
 const API_CONFIG = {
-    BASE_URL: 'https://api.example.com',
-    AUTH_ENDPOINT: '/login'
+    BASE_URL: 'https://api.example.com'
 };
 
 if (typeof module !== 'undefined' && module.exports) {
