@@ -4,8 +4,8 @@ import TaskTemplates from './templates.js';
 
 class TaskManager {
     constructor() {
-        this.authToken = localStorage.getItem('authToken');
-        this.currentUser = JSON.parse(localStorage.getItem('currentUser'));
+        this.authData = localStorage.getItem('authData');
+        this.currentUser = localStorage.getItem('currentUser');
         this.tasks = [];
         this.archivedTasks = [];
         this.allSpoilersExpanded = false;
@@ -34,21 +34,26 @@ class TaskManager {
     }
 
     async handleLogin(login, password) {
+        const authData = btoa(`${login}:${password}`);
+
         try {
-            const response = await fetch(`${this.apiConfig.BASE_URL}${this.apiConfig.AUTH_ENDPOINT}`, {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({login, password})
+            const response = await fetch(`${this.apiConfig.BASE_URL}/login`, {
+                headers: {
+                    'Authorization': `Basic ${authData}`
+                }
             });
 
-            const {token, user} = await response.json();
-            localStorage.setItem('authToken', token);
-            localStorage.setItem('currentUser', JSON.stringify(user));
-            this.authToken = token;
-            this.currentUser = user;
-            this.initApp();
+            if (response.ok) {
+                localStorage.setItem('authData', authData);
+                localStorage.setItem('currentUser', login);
+                this.authData = authData;
+                this.currentUser = login;
+                this.initApp();
+            } else {
+                throw new Error('Ошибка авторизации');
+            }
         } catch (error) {
-            alert('Ошибка авторизации');
+            alert(error.message);
         }
     }
 
@@ -77,7 +82,7 @@ class TaskManager {
             const response = await fetch(`${this.apiConfig.BASE_URL}/tasks`, {
                 headers: {
                     'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${this.authToken}`
+                    'Authorization': `Basic ${this.authData}`
                 }
             });
             const data = await response.json();
@@ -108,7 +113,7 @@ class TaskManager {
             const response = await fetch(`${this.apiConfig.BASE_URL}/archive`, {
                 headers: {
                     'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${this.authToken}`
+                    'Authorization': `Basic ${this.authData}`
                 }
             });
             const data = await response.json();
@@ -243,7 +248,7 @@ class TaskManager {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${this.authToken}`
+                    'Authorization': `Basic ${this.authData}`
                 },
                 body: JSON.stringify({content: content.trim()})
             });
@@ -283,7 +288,7 @@ class TaskManager {
                 method: 'DELETE',
                 headers: {
                     'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${this.authToken}`
+                    'Authorization': `Basic ${this.authData}`
                 }
             });
 
@@ -316,7 +321,7 @@ class TaskManager {
         });
 
         logoutBtn.addEventListener('click', () => {
-            localStorage.removeItem('authToken');
+            localStorage.removeItem('authData');
             localStorage.removeItem('currentUser');
             window.location.reload();
         });
@@ -456,14 +461,7 @@ class TaskManager {
         }
 
         try {
-            const response = await fetch(`${this.apiConfig.BASE_URL}/archive`, {
-                method: 'DELETE',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${password}`
-                }
-            });
-
+            const response = await fetch(`${this.apiConfig.BASE_URL}/archive`, {method: 'DELETE'});
             if (!response.ok) {
                 throw new Error('Неверный пароль');
             }
