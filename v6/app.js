@@ -19,9 +19,10 @@ class TaskManager {
         };
 
         window.addEventListener('resize', this.handleResize);
-        if (this.authToken) {
+        if (this.authData) {
             this.initApp();
         } else {
+            this.setupLoginButton()
             this.showLogin();
         }
         this.setupConfirmationModal();
@@ -29,11 +30,12 @@ class TaskManager {
 
     showLogin() {
         document.getElementById('loginPage').style.display = 'block';
-        document.getElementById('header').style.display = 'none';
+        document.getElementsByClassName('header')[0].style.display = 'none';
         document.getElementById('mainPage').style.display = 'none';
     }
 
     async handleLogin(login, password) {
+        console.log(`handleLogin ${login} ${password}`)
         const authData = btoa(`${login}:${password}`);
 
         try {
@@ -59,9 +61,9 @@ class TaskManager {
 
     initApp() {
         document.getElementById('loginPage').style.display = 'none';
-        document.getElementById('header').style.display = 'flex';
+        document.getElementsByClassName('header')[0].style.display = 'flex';
         document.getElementById('mainPage').style.display = 'block';
-        document.getElementById('username').textContent = this.currentUser?.username;
+        document.getElementById('username').textContent = this.currentUser ? this.currentUser : 'username';
         this.init();
     }
 
@@ -417,6 +419,15 @@ class TaskManager {
         return window.innerWidth <= 600;
     }
 
+    setupLoginButton() {
+        document.getElementById('loginBtn').addEventListener('click', () => {
+            const login = document.getElementById('loginInput').value;
+            const password = document.getElementById('passwordLoginInput').value;
+            console.log(`getElementById loginBtn ${login} ${password}`)
+            this.handleLogin(login, password);
+        });
+    }
+
     setupEventListeners() {
         const taskInput = document.getElementById('taskInput');
 
@@ -444,12 +455,6 @@ class TaskManager {
             if (e.key === 'Enter') {
                 await this.clearArchive();
             }
-        });
-
-        document.getElementById('loginBtn').addEventListener('click', () => {
-            const login = document.getElementById('loginInput').value;
-            const password = document.getElementById('passwordLoginInput').value;
-            this.handleLogin(login, password);
         });
     }
 
