@@ -456,6 +456,13 @@ class TaskManager {
                 await this.clearArchive();
             }
         });
+
+        document.getElementById('saveBtn').addEventListener('click', async () => {
+            const taskInput = document.getElementById('taskInput');
+            if (taskInput.value.trim()) {
+                await this.addTask(taskInput.value);
+            }
+        });
     }
 
     async clearArchive() {
