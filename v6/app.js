@@ -466,7 +466,13 @@ class TaskManager {
         }
 
         try {
-            const response = await fetch(`${this.apiConfig.BASE_URL}/archive`, {method: 'DELETE'});
+            const response = await fetch(`${this.apiConfig.BASE_URL}/archive`, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Basic ${this.authData}`
+                }
+            });
             if (!response.ok) {
                 throw new Error('Неверный пароль');
             }
