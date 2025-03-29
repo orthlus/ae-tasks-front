@@ -2,7 +2,7 @@ FROM nginx:alpine
 WORKDIR /app
 
 #COPY dist .
-COPY v4 .
+COPY v6 .
 COPY config.js .
 
 COPY nginx.conf /etc/nginx/nginx.conf
