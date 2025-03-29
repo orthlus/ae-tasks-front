@@ -12,6 +12,8 @@ class TaskManager {
         this.apiConfig = window.API_CONFIG;
         this.isArchiveLoaded = false;
         this.expandedTaskIds = new Set();
+        this.scrollHandler = this.handleScroll.bind(this);
+        window.addEventListener('scroll', this.scrollHandler);
 
         this.handleResize = () => {
             window.location.hash === '#archive'
@@ -27,6 +29,12 @@ class TaskManager {
             this.showLogin();
         }
         this.setupConfirmationModal();
+    }
+
+    handleScroll() {
+        if (this.isMobile()) {
+            this.restoreExpandedState();
+        }
     }
 
     showLogin() {
@@ -225,8 +233,18 @@ class TaskManager {
     }
 
     toggleAllSpoilers(expand) {
-        document.querySelectorAll('.task-spoiler').forEach(spoiler => {
-            spoiler.classList.toggle('active', expand);
+        this.allSpoilersExpanded = expand;
+        document.querySelectorAll('.task').forEach(taskEl => {
+            const spoiler = taskEl.querySelector('.task-spoiler');
+            if (spoiler) {
+                const taskId = parseInt(taskEl.dataset.id);
+                if (expand) {
+                    this.expandedTaskIds.add(taskId);
+                } else {
+                    this.expandedTaskIds.delete(taskId);
+                }
+                spoiler.classList.toggle('active', expand);
+            }
         });
     }
 
@@ -333,23 +351,21 @@ class TaskManager {
     }
 
     setupTaskInteractions() {
-        // Удаляем старые обработчики
-        document.querySelectorAll('.task').forEach(el => {
-            el.replaceWith(el.cloneNode(true));
-        });
-
-        // Добавляем новые обработчики для всех задач
         document.querySelectorAll('.task').forEach(taskEl => {
-            taskEl.addEventListener('click', (e) => {
+            // Удаляем все старые обработчики
+            const newTaskEl = taskEl.cloneNode(true);
+            taskEl.parentNode.replaceChild(newTaskEl, taskEl);
+
+            // Добавляем новые обработчики
+            newTaskEl.addEventListener('click', (e) => {
                 if (e.target.closest('.delete-btn, .copy-btn') ||
                     window.getSelection().toString().length > 0) {
                     return;
                 }
-                this.toggleTaskDescription(taskEl);
+                this.toggleTaskDescription(newTaskEl);
             });
         });
 
-        // Обработчики для кнопок копирования
         document.querySelectorAll('.copy-btn').forEach(btn => {
             btn.addEventListener('click', (e) => this.handleCopyButton(e, btn));
         });
@@ -375,12 +391,15 @@ class TaskManager {
     }
 
     restoreExpandedState() {
-        document.querySelectorAll('.task').forEach(taskEl => {
-            const taskId = parseInt(taskEl.dataset.id);
-            const spoiler = taskEl.querySelector('.task-spoiler');
-            if (spoiler && this.expandedTaskIds.has(taskId)) {
-                spoiler.classList.add('active');
-            }
+        requestAnimationFrame(() => {
+            document.querySelectorAll('.task').forEach(taskEl => {
+                const taskId = parseInt(taskEl.dataset.id);
+                const spoiler = taskEl.querySelector('.task-spoiler');
+                if (spoiler) {
+                    spoiler.classList.toggle('active',
+                        this.expandedTaskIds.has(taskId) || this.allSpoilersExpanded);
+                }
+            });
         });
     }
 
