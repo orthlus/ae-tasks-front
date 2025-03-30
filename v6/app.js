@@ -14,6 +14,8 @@ class TaskManager {
         this.expandedTaskIds = new Set();
         this.scrollHandler = this.handleScroll.bind(this);
         window.addEventListener('scroll', this.scrollHandler);
+        this.handleWheel = this.handleWheel.bind(this);
+        window.addEventListener('wheel', this.handleWheel, { passive: false });
 
         this.handleResize = () => {
             window.location.hash === '#archive'
@@ -29,6 +31,20 @@ class TaskManager {
             this.showLogin();
         }
         this.setupConfirmationModal();
+
+        this.wheelHandler = this.handleWheel.bind(this);
+    }
+
+    handleWheel(e) {
+        if (e.ctrlKey) {
+            e.preventDefault();
+            const scrollAmount = 1000; // Количество пикселей для прокрутки
+            if (e.deltaY < 0) {
+                window.scrollBy({ top: -scrollAmount, behavior: 'instant' });
+            } else {
+                window.scrollBy({ top: scrollAmount, behavior: 'instant' });
+            }
+        }
     }
 
     handleScroll() {
@@ -536,6 +552,10 @@ class TaskManager {
             console.error('Ошибка удаления архива:', error);
             alert(error.message);
         }
+    }
+
+    destroy() {
+        window.removeEventListener('wheel', this.wheelHandler);
     }
 }
 
