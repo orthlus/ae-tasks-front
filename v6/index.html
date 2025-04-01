@@ -395,6 +395,10 @@
                 align-items: center;
                 margin-right: 0.5rem;
             }
+            .task-content p {
+                margin: 0 0 0.8em 0;
+                line-height: 1.6;
+            }
         }
 
         .copy-btn {
@@ -429,6 +433,11 @@
             resize: none;
             transition: height 0.2s ease-out;
         }
+
+        .task-content p {
+            margin: 0 0 0.8em 0;
+            line-height: 1.6;
+        }
     </style>
 </head>
 <body>
@@ -455,7 +464,6 @@
                 placeholder="Введите задачу (Ctrl/Shift + Enter для добавления)"
                 aria-label="Поле ввода новой задачи"
                 autocomplete="off"
-                autocorrect="off"
                 rows="1"
                 name="task"
                 data-lpignore="true"
@@ -492,7 +500,7 @@
         </div>
     </div>
 
-    <script src="config.js?v=2.0"></script>
-    <script type="module" src="app.js?v=2.0"></script>
+    <script src="config.js?v=4.0"></script>
+    <script type="module" src="app.js?v=4.0"></script>
 </body>
 </html>
