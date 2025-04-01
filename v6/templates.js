@@ -58,10 +58,16 @@ const TaskTemplates = {
 
     processDescription(description) {
         if (!description) return '';
-        return description.replace(
-            /(https?:\/\/[^\s]+)/g,
-            '<a href="$1" target="_blank" rel="noopener noreferrer">$1</a>'
-        );
+        return description
+            .split('\n')
+            .map(paragraph =>
+                `<p>${paragraph}</p>`
+            )
+            .join('')
+            .replace(
+                /(https?:\/\/[^\s]+)/g,
+                '<a href="$1" target="_blank" rel="noopener noreferrer">$1</a>'
+            );
     },
 };
 
