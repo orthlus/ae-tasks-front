@@ -553,10 +553,6 @@ class TaskManager {
             alert(error.message);
         }
     }
-
-    destroy() {
-        window.removeEventListener('wheel', this.wheelHandler);
-    }
 }
 
 new TaskManager();
