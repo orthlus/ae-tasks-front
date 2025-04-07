@@ -31,8 +31,6 @@ class TaskManager {
             this.showLogin();
         }
         this.setupConfirmationModal();
-
-        this.wheelHandler = this.handleWheel.bind(this);
     }
 
     handleWheel(e) {
