@@ -372,7 +372,7 @@ class TaskManager {
 
             // Добавляем новые обработчики
             newTaskEl.addEventListener('click', (e) => {
-                if (e.target.closest('.delete-btn, .copy-btn') ||
+                if (e.target.closest('.delete-btn, .copy-btn, a') ||
                     window.getSelection().toString().length > 0) {
                     return;
                 }
