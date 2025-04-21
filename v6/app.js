@@ -416,18 +416,25 @@ class TaskManager {
         const existingEditor = taskEl.querySelector('.edit-container');
         if (existingEditor) return;
 
-        const task = [...this.tasks, ...this.archivedTasks].find(t => t.id === taskId);
         const editorHtml = `
             <div class="edit-container">
-                <textarea class="edit-textarea">${task.description || ''}</textarea>
-                <button class="save-edit-btn" data-id="${taskId}">Сохранить</button>
+                <textarea class="edit-textarea" placeholder="Введите новое описание"></textarea>
+                <div class="edit-buttons">
+                    <button class="cancel-edit-btn">Отмена</button>
+                    <button class="save-edit-btn" data-id="${taskId}">Сохранить</button>
+                </div>
             </div>
         `;
 
         taskEl.insertAdjacentHTML('beforeend', editorHtml);
+
         taskEl.querySelector('.save-edit-btn').addEventListener('click', (e) => {
             const newDescription = taskEl.querySelector('.edit-textarea').value;
             this.updateTaskDescription(taskId, newDescription);
+        });
+
+        taskEl.querySelector('.cancel-edit-btn').addEventListener('click', () => {
+            taskEl.querySelector('.edit-container').remove();
         });
     }
 
