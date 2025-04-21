@@ -8,7 +8,9 @@ COPY v6 .
 RUN html-minifier index.html --collapse-whitespace --remove-comments -o index.html
 RUN terser app.js --compress --mangle -o app.js
 RUN terser templates.js --compress --mangle -o templates.js
-#RUN cleancss styles.css -O2 -o styles.css
+RUN cleancss base.css -O2 -o base.css
+RUN cleancss mobile.css -O2 -o mobile.css
+RUN cleancss desktop.css -O2 -o desktop.css
 
 FROM nginx:alpine
 WORKDIR /app

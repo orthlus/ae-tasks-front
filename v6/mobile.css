@@ -1,0 +1,88 @@
+@media (max-width: 600px) {
+    body {
+        padding: 0.75rem;
+        font-size: 14px;
+    }
+
+    .task-title-mobile, .task-title {
+        font-size: 15px;
+    }
+
+    .task-content {
+        font-size: 13px;
+    }
+
+    .task {
+        flex-direction: row;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        padding: 0.3rem;
+        margin: 0.25rem 0;
+    }
+
+    .task-header-mobile {
+        display: flex;
+        width: 100%;
+        min-height: 2rem;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .task-number {
+        width: auto;
+    }
+
+    .task-title-mobile {
+        flex-grow: 1;
+    }
+
+    #taskInput {
+        min-height: 3rem;
+        padding: 0.5rem;
+        -webkit-user-select: text;
+        user-select: text;
+        -webkit-touch-callout: default;
+    }
+
+    .input-header {
+        flex-direction: row;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .input-header h3 {
+        margin: 0;
+        flex-grow: 1;
+    }
+
+    .toggle-spoilers {
+        margin: 0;
+        padding: 0.5rem;
+        white-space: nowrap;
+    }
+
+    .save-btn {
+        display: block;
+    }
+
+    .modal-content, .password-modal-content {
+        width: 85%;
+        padding: 15px;
+    }
+
+    .modal-actions, .password-modal-buttons {
+        flex-direction: column;
+    }
+
+    .modal-btn, .password-modal-btn {
+        width: 100%;
+        padding: 10px;
+    }
+
+    .task-number-wrapper {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        margin-right: 0.5rem;
+    }
+}
