@@ -1,16 +1,21 @@
 FROM node:18-alpine AS builder
 WORKDIR /app
 
-RUN npm install -g html-minifier terser clean-css-cli
+RUN npm install -g html-minifier terser
 
 COPY v6 .
 
-RUN cleancss base.css -O2 -o base.css
-RUN cleancss mobile.css -O2 -o mobile.css
-RUN cleancss desktop.css -O2 -o desktop.css
-RUN html-minifier index.html --collapse-whitespace --remove-comments -o index.html
-RUN terser templates.js --compress --mangle -o templates.js
-RUN terser app.js --compress --mangle -o app.js
+RUN find . -type f -name "*.html" \
+    -exec html-minifier {} \
+    --collapse-whitespace \
+    --remove-comments \
+    -o {} \;
+RUN find . -type f -name "*.js" \
+    -not -name "*.min.js" \
+    -exec terser {} \
+    --compress \
+    --mangle \
+    -o {} \;
 
 FROM nginx:alpine
 WORKDIR /app
