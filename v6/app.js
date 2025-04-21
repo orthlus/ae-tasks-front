@@ -423,7 +423,7 @@ class TaskManager {
 
         const editorHtml = `
             <div class="edit-container">
-                <textarea class="edit-textarea" placeholder="Введите новое описание"></textarea>
+                <textarea class="edit-textarea" placeholder="Введите дополнение к описанию"></textarea>
                 <div class="edit-buttons">
                     <button class="cancel-edit-btn">Отмена</button>
                     <button class="save-edit-btn" data-id="${taskId}">Сохранить</button>
