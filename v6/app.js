@@ -418,6 +418,9 @@ class TaskManager {
         const existingEditor = taskEl.querySelector('.edit-container');
         if (existingEditor) return;
 
+        const actionsBlock = taskEl.querySelector('.task-actions');
+        if (actionsBlock) actionsBlock.style.display = 'none';
+
         const editorHtml = `
             <div class="edit-container">
                 <textarea class="edit-textarea" placeholder="Введите новое описание"></textarea>
@@ -436,13 +439,17 @@ class TaskManager {
 
             if (newDescription === "") {
                 taskEl.querySelector('.edit-container').remove();
+                if (actionsBlock) actionsBlock.style.display = 'flex';
             } else {
-                this.updateTaskDescription(taskId, newDescription);
+                this.updateTaskDescription(taskId, newDescription).finally(() => {
+                    if (actionsBlock) actionsBlock.style.display = 'flex';
+                });
             }
         });
 
         taskEl.querySelector('.cancel-edit-btn').addEventListener('click', () => {
             taskEl.querySelector('.edit-container').remove();
+            if (actionsBlock) actionsBlock.style.display = 'flex';
         });
     }
 

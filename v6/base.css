@@ -118,6 +118,8 @@ body {
     flex-shrink: 0;
     margin-left: auto;
     pointer-events: none;
+    display: flex;
+    gap: 4px;
 }
 
 .task-actions button {
