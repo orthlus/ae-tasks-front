@@ -431,7 +431,12 @@ class TaskManager {
             </div>
         `;
 
-        taskEl.insertAdjacentHTML('beforeend', editorHtml);
+        const contentWrapper = taskEl.querySelector('.task-content-wrapper');
+        if (contentWrapper) {
+            contentWrapper.insertAdjacentHTML('beforeend', editorHtml);
+        } else {
+            taskEl.insertAdjacentHTML('beforeend', editorHtml);
+        }
 
         taskEl.querySelector('.save-edit-btn').addEventListener('click', (e) => {
             const textarea = taskEl.querySelector('.edit-textarea');
