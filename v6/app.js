@@ -270,6 +270,26 @@ class TaskManager {
         }
     }
 
+    async updateTaskDescription(taskId, newDescription) {
+        try {
+            await fetch(`${this.apiConfig.BASE_URL}/tasks/${taskId}`, {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Basic ${this.authData}`
+                },
+                body: JSON.stringify({ description: newDescription })
+            });
+            const task = this.tasks.find(t => t.id === taskId)
+                || this.archivedTasks.find(t => t.id === taskId);
+            if (task) task.description = newDescription;
+            this.render();
+        } catch (error) {
+            console.error('Ошибка обновления:', error);
+            alert('Не удалось обновить задачу');
+        }
+    }
+
     async addTask(content) {
         const taskInput = document.getElementById('taskInput');
         const saveBtn = document.getElementById('saveBtn');
@@ -382,6 +402,32 @@ class TaskManager {
 
         document.querySelectorAll('.copy-btn').forEach(btn => {
             btn.addEventListener('click', (e) => this.handleCopyButton(e, btn));
+        });
+
+        document.querySelectorAll('.edit-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => this.handleEditButton(e));
+        });
+    }
+
+    handleEditButton(e) {
+        e.stopPropagation();
+        const taskId = parseInt(e.target.dataset.id);
+        const taskEl = e.target.closest('.task');
+        const existingEditor = taskEl.querySelector('.edit-container');
+        if (existingEditor) return;
+
+        const task = [...this.tasks, ...this.archivedTasks].find(t => t.id === taskId);
+        const editorHtml = `
+            <div class="edit-container">
+                <textarea class="edit-textarea">${task.description || ''}</textarea>
+                <button class="save-edit-btn" data-id="${taskId}">Сохранить</button>
+            </div>
+        `;
+
+        taskEl.insertAdjacentHTML('beforeend', editorHtml);
+        taskEl.querySelector('.save-edit-btn').addEventListener('click', (e) => {
+            const newDescription = taskEl.querySelector('.edit-textarea').value;
+            this.updateTaskDescription(taskId, newDescription);
         });
     }
 
