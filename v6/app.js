@@ -15,7 +15,7 @@ class TaskManager {
         this.scrollHandler = this.handleScroll.bind(this);
         window.addEventListener('scroll', this.scrollHandler);
         this.handleWheel = this.handleWheel.bind(this);
-        window.addEventListener('wheel', this.handleWheel, { passive: false });
+        window.addEventListener('wheel', this.handleWheel, {passive: false});
 
         this.handleResize = () => {
             window.location.hash === '#archive'
@@ -38,9 +38,9 @@ class TaskManager {
             e.preventDefault();
             const scrollAmount = 1000; // Количество пикселей для прокрутки
             if (e.deltaY < 0) {
-                window.scrollBy({ top: -scrollAmount, behavior: 'instant' });
+                window.scrollBy({top: -scrollAmount, behavior: 'instant'});
             } else {
-                window.scrollBy({ top: scrollAmount, behavior: 'instant' });
+                window.scrollBy({top: scrollAmount, behavior: 'instant'});
             }
         }
     }
@@ -278,11 +278,13 @@ class TaskManager {
                     'Content-Type': 'application/json',
                     'Authorization': `Basic ${this.authData}`
                 },
-                body: JSON.stringify({ description: newDescription })
+                body: JSON.stringify({content: newDescription})
             });
-            const task = this.tasks.find(t => t.id === taskId)
-                || this.archivedTasks.find(t => t.id === taskId);
-            if (task) task.description = newDescription;
+            const task = this.tasks.find(t => t.id === taskId);
+            if (task) {
+                task.description = `${task.description}\n${newDescription}`;
+            }
+
             this.render();
         } catch (error) {
             console.error('Ошибка обновления:', error);
@@ -392,7 +394,7 @@ class TaskManager {
 
             // Добавляем новые обработчики
             newTaskEl.addEventListener('click', (e) => {
-                if (e.target.closest('.delete-btn, .copy-btn, a') ||
+                if (e.target.closest('.delete-btn, .copy-btn, a, .edit-btn, .edit-container, .edit-textarea') ||
                     window.getSelection().toString().length > 0) {
                     return;
                 }
@@ -429,8 +431,14 @@ class TaskManager {
         taskEl.insertAdjacentHTML('beforeend', editorHtml);
 
         taskEl.querySelector('.save-edit-btn').addEventListener('click', (e) => {
-            const newDescription = taskEl.querySelector('.edit-textarea').value;
-            this.updateTaskDescription(taskId, newDescription);
+            const textarea = taskEl.querySelector('.edit-textarea');
+            const newDescription = textarea.value.trim();
+
+            if (newDescription === "") {
+                taskEl.querySelector('.edit-container').remove();
+            } else {
+                this.updateTaskDescription(taskId, newDescription);
+            }
         });
 
         taskEl.querySelector('.cancel-edit-btn').addEventListener('click', () => {

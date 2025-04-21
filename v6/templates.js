@@ -22,7 +22,7 @@ const TaskTemplates = {
                 </div>
                 <div class="task-title-mobile">${task.title}</div>
                 <div class="task-actions">
-                    ${this.editButton(task.id)}
+                    ${!isArchive ? this.editButton(task.id) : ''}
                     ${this.deleteButton(task.id, isArchive)}
                 </div>
             </div>
@@ -40,7 +40,7 @@ const TaskTemplates = {
                 ${descriptionHtml}
             </div>
             <div class="task-actions">
-                ${this.editButton(task.id)}
+                ${!isArchive ? this.editButton(task.id) : ''}
                 ${this.deleteButton(task.id, isArchive)}
             </div>`;
     },
