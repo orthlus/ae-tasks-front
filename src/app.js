@@ -421,15 +421,7 @@ class TaskManager {
         const actionsBlock = taskEl.querySelector('.task-actions');
         if (actionsBlock) actionsBlock.style.display = 'none';
 
-        const editorHtml = `
-            <div class="edit-container">
-                <textarea class="edit-textarea" placeholder="Введите дополнение к описанию"></textarea>
-                <div class="edit-buttons">
-                    <button class="cancel-edit-btn">Отмена</button>
-                    <button class="save-edit-btn" data-id="${taskId}">Сохранить</button>
-                </div>
-            </div>
-        `;
+        const editorHtml = TaskTemplates.editInputHtml(taskId);
 
         const contentWrapper = taskEl.querySelector('.task-content-wrapper');
         if (contentWrapper) {

@@ -73,6 +73,24 @@ const TaskTemplates = {
             .map(paragraph => `<p>${paragraph}</p>`)
             .join('');
     },
+
+    editInputHtml(taskId) {
+        return `
+            <div class="edit-container">
+                <textarea 
+                        class="edit-textarea autogrow-textarea" 
+                        placeholder="Введите дополнение к описанию"
+                        autocomplete="off"
+                        rows="1"
+                        data-lpignore="true"
+                ></textarea>
+                <div class="edit-buttons">
+                    <button class="cancel-edit-btn">Отмена</button>
+                    <button class="save-edit-btn" data-id="${taskId}">Сохранить</button>
+                </div>
+            </div>
+        `;
+    }
 };
 
 export default TaskTemplates;
