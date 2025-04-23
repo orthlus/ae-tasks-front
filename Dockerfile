@@ -3,7 +3,7 @@ WORKDIR /app
 
 RUN npm install -g html-minifier terser
 
-COPY v6 .
+COPY src .
 
 RUN find . -type f -name "*.html" \
     -exec html-minifier {} \
