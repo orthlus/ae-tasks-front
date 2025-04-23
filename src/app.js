@@ -18,6 +18,7 @@ class TaskManager {
         window.addEventListener('wheel', this.handleWheel, {passive: false});
 
         this.handleResize = () => {
+            if (document.activeElement.tagName === 'TEXTAREA') return;
             window.location.hash === '#archive'
                 ? this.renderArchived()
                 : this.render();
@@ -46,7 +47,7 @@ class TaskManager {
     }
 
     handleScroll() {
-        if (this.isMobile()) {
+        if (this.isMobile() && document.activeElement.tagName !== 'TEXTAREA') {
             this.restoreExpandedState();
         }
     }
@@ -448,6 +449,8 @@ class TaskManager {
             taskEl.querySelector('.edit-container').remove();
             if (actionsBlock) actionsBlock.style.display = 'flex';
         });
+
+        taskEl.querySelector('.edit-textarea').focus();
     }
 
     handleCopyButton(e, btn) {
