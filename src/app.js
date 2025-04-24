@@ -59,7 +59,6 @@ class TaskManager {
     }
 
     async handleLogin(login, password) {
-        console.log(`handleLogin ${login} ${password}`)
         const authData = btoa(`${login}:${password}`);
 
         try {
@@ -545,7 +544,6 @@ class TaskManager {
         document.getElementById('loginBtn').addEventListener('click', () => {
             const login = document.getElementById('loginInput').value;
             const password = document.getElementById('passwordLoginInput').value;
-            console.log(`getElementById loginBtn ${login} ${password}`)
             this.handleLogin(login, password);
         });
     }
