@@ -521,6 +521,11 @@ class TaskManager {
         container.innerHTML = this.tasks
             .map(task => TaskTemplates.taskElement(task, this.isMobile()))
             .join('');
+
+        const taskCountElement = document.getElementById('taskCount');
+        if (taskCountElement) {
+            taskCountElement.textContent = `Текущие задачи: ${this.tasks.length} шт`;
+        }
     }
 
     renderArchived() {
