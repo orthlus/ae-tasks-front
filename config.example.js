@@ -1,5 +1,5 @@
 const API_CONFIG = {
-    BASE_URL: 'https://api.example.com'
+    BASE_URL: '/api'
 };
 
 if (typeof module !== 'undefined' && module.exports) {
