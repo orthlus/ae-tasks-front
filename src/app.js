@@ -4,8 +4,6 @@ import TaskTemplates from './templates.js';
 
 class TaskManager {
     constructor() {
-        this.authData = localStorage.getItem('authData');
-        this.currentUser = localStorage.getItem('currentUser');
         this.tasks = [];
         this.archivedTasks = [];
         this.allSpoilersExpanded = false;
@@ -25,12 +23,7 @@ class TaskManager {
         };
 
         window.addEventListener('resize', this.handleResize);
-        if (this.authData) {
-            this.initApp();
-        } else {
-            this.setupLoginButton()
-            this.showLogin();
-        }
+        this.initApp();
         this.setupConfirmationModal();
     }
 
@@ -52,48 +45,15 @@ class TaskManager {
         }
     }
 
-    showLogin() {
-        document.getElementById('loginPage').style.display = 'block';
-        document.getElementsByClassName('header')[0].style.display = 'none';
-        document.getElementById('mainPage').style.display = 'none';
-    }
-
-    async handleLogin(login, password) {
-        const authData = btoa(`${login}:${password}`);
-
-        try {
-            const response = await fetch(`${this.apiConfig.BASE_URL}/login`, {
-                headers: {
-                    'Authorization': `Basic ${authData}`
-                }
-            });
-
-            if (response.ok) {
-                localStorage.setItem('authData', authData);
-                localStorage.setItem('currentUser', login);
-                this.authData = authData;
-                this.currentUser = login;
-                this.initApp();
-            } else {
-                throw new Error('Ошибка авторизации');
-            }
-        } catch (error) {
-            alert(error.message);
-        }
-    }
-
     initApp() {
-        document.getElementById('loginPage').style.display = 'none';
-        document.getElementsByClassName('header')[0].style.display = 'flex';
         document.getElementById('mainPage').style.display = 'block';
-        document.getElementById('username').textContent = this.currentUser ? this.currentUser : 'username';
         this.init();
     }
 
     async init() {
         this.setupNavigation();
         this.setupEventListeners();
-        this.setupUserDropdown();
+        // this.setupUserDropdown();
         this.setupToggleAllSpoilers();
         await this.fetchTasks();
         this.render();
@@ -107,7 +67,6 @@ class TaskManager {
             const response = await fetch(`${this.apiConfig.BASE_URL}/tasks`, {
                 headers: {
                     'Content-Type': 'application/json',
-                    'Authorization': `Basic ${this.authData}`
                 }
             });
             const data = await response.json();
@@ -138,7 +97,6 @@ class TaskManager {
             const response = await fetch(`${this.apiConfig.BASE_URL}/archive`, {
                 headers: {
                     'Content-Type': 'application/json',
-                    'Authorization': `Basic ${this.authData}`
                 }
             });
             const data = await response.json();
@@ -276,7 +234,6 @@ class TaskManager {
                 method: 'PATCH',
                 headers: {
                     'Content-Type': 'application/json',
-                    'Authorization': `Basic ${this.authData}`
                 },
                 body: JSON.stringify({content: newDescription})
             });
@@ -305,7 +262,6 @@ class TaskManager {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'Authorization': `Basic ${this.authData}`
                 },
                 body: JSON.stringify({content: content.trim()})
             });
@@ -345,7 +301,6 @@ class TaskManager {
                 method: 'DELETE',
                 headers: {
                     'Content-Type': 'application/json',
-                    'Authorization': `Basic ${this.authData}`
                 }
             });
 
@@ -366,24 +321,6 @@ class TaskManager {
         window.addEventListener('hashchange', () => {
             window.location.hash === '#archive' ? this.showArchive() : this.showMain();
         });
-    }
-
-    setupUserDropdown() {
-        const username = document.getElementById('username');
-        const logoutBtn = document.getElementById('logoutBtn');
-
-        username.addEventListener('click', (e) => {
-            e.stopPropagation();
-            logoutBtn.classList.toggle('visible');
-        });
-
-        logoutBtn.addEventListener('click', () => {
-            localStorage.removeItem('authData');
-            localStorage.removeItem('currentUser');
-            window.location.reload();
-        });
-
-        document.addEventListener('click', () => logoutBtn.classList.remove('visible'));
     }
 
     setupTaskInteractions() {
@@ -540,14 +477,6 @@ class TaskManager {
 
     isMobile() {
         return window.innerWidth <= 600;
-    }
-
-    setupLoginButton() {
-        document.getElementById('loginBtn').addEventListener('click', () => {
-            const login = document.getElementById('loginInput').value;
-            const password = document.getElementById('passwordLoginInput').value;
-            this.handleLogin(login, password);
-        });
     }
 
     setupEventListeners() {
